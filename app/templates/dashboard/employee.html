@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% from "_macros.html" import score_badge, status_badge %}
+{% block title %}Dashboard{% endblock %}
+{% block heading %}{{ employee.full_name }} · Dashboard{% endblock %}
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-md-3"><div class="card stat-card"><div class="card-body">
+    <div class="stat-label">Growth Score</div>
+    <div class="score-ring cat-{{ score.category }}">{{ score.overall }}</div>
+    {{ score_badge(score.category) }}
+  </div></div></div>
+  <div class="col-md-3"><div class="card stat-card"><div class="card-body">
+    <div class="stat-label">Modules Completed</div>
+    <div class="stat-value">{{ completed }}/{{ assignments }}</div>
+    <div class="text-secondary small">{{ pending }} pending</div>
+  </div></div></div>
+  <div class="col-md-3"><div class="card stat-card"><div class="card-body">
+    <div class="stat-label">Learning Hours</div>
+    <div class="stat-value">{{ total_hours }}</div>
+  </div></div></div>
+  <div class="col-md-3"><div class="card stat-card"><div class="card-body">
+    <div class="stat-label">Assessment Avg</div>
+    <div class="stat-value">{{ score.components.assessment }}%</div>
+  </div></div></div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-5"><div class="card h-100"><div class="card-body">
+    <h6 class="text-secondary mb-3">Growth Score Breakdown</h6>
+    <canvas id="scoreRadar" height="220"></canvas>
+  </div></div></div>
+
+  <div class="col-lg-7"><div class="card h-100"><div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h6 class="text-secondary mb-0">Weekly Goals</h6>
+      <a href="{{ url_for('goals.index') }}" class="small">Manage</a>
+    </div>
+    <ul class="list-group list-group-flush mb-3">
+      {% for g in weekly_goals %}
+      <li class="list-group-item d-flex justify-content-between px-0">
+        <span>{{ g.title }}</span>{{ status_badge(g.status) }}
+      </li>
+      {% else %}<li class="list-group-item px-0 text-secondary">No weekly goals yet.</li>{% endfor %}
+    </ul>
+    <h6 class="text-secondary mb-2">Monthly Goals</h6>
+    <ul class="list-group list-group-flush">
+      {% for g in monthly_goals %}
+      <li class="list-group-item d-flex justify-content-between px-0">
+        <span>{{ g.title }}</span>{{ status_badge(g.status) }}
+      </li>
+      {% else %}<li class="list-group-item px-0 text-secondary">No monthly goals yet.</li>{% endfor %}
+    </ul>
+  </div></div></div>
+</div>
+
+<div class="card mt-3"><div class="card-body">
+  <h6 class="text-secondary mb-3">Achievement Badges</h6>
+  {% if badges %}
+    {% for b in badges %}
+    <span class="badge bg-light border text-dark p-2 me-2 mb-2"><i class="bi bi-award-fill text-warning"></i> {{ b.badge.name }}</span>
+    {% endfor %}
+  {% else %}<p class="text-secondary mb-0">No badges earned yet. Keep learning!</p>{% endif %}
+</div></div>
+{% endblock %}
+{% block scripts %}
+<script>renderScoreRadar("scoreRadar", "{{ url_for('api.score_chart', employee_id=employee.id) }}");</script>
+{% endblock %}

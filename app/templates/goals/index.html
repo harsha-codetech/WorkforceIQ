@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Goals{% endblock %}
+{% block heading %}{{ employee.full_name }} · Goals{% endblock %}
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-md-3"><div class="card stat-card"><div class="card-body"><div class="stat-label">Total</div><div class="stat-value">{{ stats.total }}</div></div></div></div>
+  <div class="col-md-3"><div class="card stat-card"><div class="card-body"><div class="stat-label">Completed</div><div class="stat-value">{{ stats.completed }}</div></div></div></div>
+  <div class="col-md-3"><div class="card stat-card"><div class="card-body"><div class="stat-label">Missed</div><div class="stat-value">{{ stats.missed }}</div></div></div></div>
+  <div class="col-md-3"><div class="card stat-card"><div class="card-body"><div class="stat-label">Achievement Rate</div><div class="stat-value">{{ stats.rate }}%</div></div></div></div>
+</div>
+
+{% if can_edit %}
+<div class="mb-3"><a href="{{ url_for('goals.create') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> New goal</a></div>
+{% endif %}
+
+<div class="row g-3">
+  {% for title, items in [('Weekly Goals', weekly), ('Monthly Goals', monthly)] %}
+  <div class="col-lg-6"><div class="card"><div class="card-body">
+    <h6 class="text-secondary mb-3">{{ title }}</h6>
+    {% for g in items %}
+    <div class="border rounded p-2 mb-2">
+      <div class="d-flex justify-content-between">
+        <strong>{{ g.title }}</strong>{{ status_badge(g.status) }}
+      </div>
+      <div class="small text-secondary">{{ g.start_date }} → {{ g.due_date }}</div>
+      {% if can_edit %}
+      <div class="mt-2 d-flex gap-1">
+        {% for s in ['in_progress','completed','missed'] %}
+        <form method="post" action="{{ url_for('goals.update_status', goal_id=g.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="status" value="{{ s }}">
+          <button class="btn btn-sm btn-outline-secondary">{{ s.replace('_',' ').title() }}</button>
+        </form>
+        {% endfor %}
+        <form method="post" action="{{ url_for('goals.delete', goal_id=g.id) }}" data-confirm="Delete this goal?">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+    {% else %}<p class="text-secondary small">None yet.</p>{% endfor %}
+  </div></div></div>
+  {% endfor %}
+</div>
+{% endblock %}

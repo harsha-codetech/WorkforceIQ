@@ -1,0 +1,26 @@
+# Web framework (stable, wheels for all supported Python versions)
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+Flask-WTF==1.2.1
+Flask-Migrate==4.0.7
+WTForms==3.1.2
+Werkzeug==3.0.3
+email-validator==2.1.1
+
+# Database driver. cryptography is required by PyMySQL for MySQL 8's default
+# caching_sha2_password authentication handshake.
+PyMySQL==1.1.1
+cryptography>=42.0
+python-dotenv==1.0.1
+
+# Analytics / reporting — floor versions so pip selects a wheel matching the
+# installed Python (avoids source builds on Windows / Python 3.13).
+pandas>=2.1
+numpy>=1.26
+openpyxl>=3.1
+reportlab>=4.1
+boto3>=1.34
+
+# Production WSGI server (Linux / Docker only)
+gunicorn>=22.0

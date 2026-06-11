@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ assessment.title }}{% endblock %}
+{% block heading %}{{ assessment.title }}{% endblock %}
+{% block content %}
+<div class="row"><div class="col-lg-9">
+  <div class="card"><div class="card-body">
+    {% if assessment.duration_minutes %}<p class="text-secondary small">Suggested time: {{ assessment.duration_minutes }} minutes · Pass mark {{ assessment.pass_percentage }}%</p>{% endif %}
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {% for q in questions %}
+      <div class="mb-4">
+        <p class="fw-semibold">{{ loop.index }}. {{ q.question_text }}</p>
+        {% for opt in ['A','B','C','D'] %}
+          {% set val = q['option_' ~ opt|lower] %}
+          {% if val %}
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="q_{{ q.id }}" id="q{{ q.id }}{{ opt }}" value="{{ opt }}" required>
+            <label class="form-check-label" for="q{{ q.id }}{{ opt }}">{{ opt }}. {{ val }}</label>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="alert alert-warning">This assessment has no questions yet.</div>
+      {% endfor %}
+      {% if questions %}<button class="btn btn-primary">Submit answers</button>{% endif %}
+      <a href="{{ url_for('assessments.index') }}" class="btn btn-link">Cancel</a>
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}

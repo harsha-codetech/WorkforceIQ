@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}Skills{% endblock %}
+{% block heading %}{{ employee.full_name }} · Skills{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-7"><div class="card"><div class="card-body">
+    <h6 class="text-secondary mb-3">Skill levels</h6>
+    <table class="table align-middle">
+      <thead><tr><th>Skill</th><th>Level</th></tr></thead>
+      <tbody>
+        {% for es, skill in rows %}
+        <tr><td>{{ skill.name }}</td>
+        <td><span class="badge bg-{{ {'beginner':'secondary','intermediate':'info','advanced':'primary','expert':'success'}[es.level] }}">{{ es.level.title() }}</span></td></tr>
+        {% else %}<tr><td colspan="2" class="text-secondary">No skills recorded.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div></div></div>
+  {% if can_edit %}
+  <div class="col-lg-5"><div class="card"><div class="card-body">
+    <h6 class="text-secondary mb-3">Add / update skill</h6>
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      {{ field(form.skill_id) }}
+      {{ field(form.level) }}
+      {{ form.submit(class="btn btn-primary") }}
+    </form>
+  </div></div></div>
+  {% endif %}
+</div>
+{% endblock %}

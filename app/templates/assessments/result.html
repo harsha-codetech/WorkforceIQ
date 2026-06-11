@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Result{% endblock %}
+{% block heading %}Assessment Result{% endblock %}
+{% block content %}
+<div class="row"><div class="col-lg-6">
+  <div class="card"><div class="card-body text-center">
+    <h5>{{ attempt.assessment.title }}</h5>
+    <div class="display-4 fw-bold cat-{{ 'high_performer' if attempt.result == 'pass' else 'critical' }}">{{ attempt.percentage }}%</div>
+    {{ status_badge(attempt.result) }}
+    <dl class="row small mt-3 text-start">
+      <dt class="col-6">Score</dt><dd class="col-6">{{ attempt.score }} / {{ attempt.assessment.total_marks }}</dd>
+      <dt class="col-6">Attempt</dt><dd class="col-6">#{{ attempt.attempt_number }}</dd>
+      <dt class="col-6">Pass mark</dt><dd class="col-6">{{ attempt.assessment.pass_percentage }}%</dd>
+    </dl>
+    {% if attempt.feedback %}<div class="alert alert-light text-start mt-2"><strong>Feedback:</strong> {{ attempt.feedback }}</div>{% endif %}
+    <a href="{{ url_for('assessments.index') }}" class="btn btn-primary mt-2">Back to assessments</a>
+  </div></div>
+</div></div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field, status_badge %}
+{% block title %}Reports{% endblock %}
+{% block heading %}Reports{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-6"><div class="card"><div class="card-body">
+    <h6 class="mb-3">Generate report</h6>
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      {{ field(form.report_type) }}
+      {% if not current_user.is_employee %}{{ field(form.employee_id) }}<small class="text-secondary">Required for employee reports.</small>{% endif %}
+      {{ field(form.format) }}
+      <div class="mt-3">{{ form.submit(class="btn btn-primary") }}</div>
+    </form>
+    <p class="text-secondary small mt-3 mb-0">Exports support PDF, Excel and CSV.</p>
+  </div></div></div>
+  <div class="col-lg-6"><div class="card"><div class="card-body">
+    <h6 class="mb-3">Recent exports</h6>
+    <table class="table table-sm align-middle">
+      <thead><tr><th>Type</th><th>Format</th><th>Status</th><th>When</th></tr></thead>
+      <tbody>
+        {% for r in recent %}
+        <tr><td class="text-capitalize">{{ r.report_type }}</td><td class="text-uppercase">{{ r.format }}</td>
+        <td>{{ status_badge(r.status) }}</td><td class="small">{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}</td></tr>
+        {% else %}<tr><td colspan="4" class="text-secondary">No reports generated yet.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div></div></div>
+</div>
+{% endblock %}

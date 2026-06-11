@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}New module{% endblock %}
+{% block heading %}New learning module{% endblock %}
+{% block content %}
+<div class="row"><div class="col-lg-8">
+  <div class="card"><div class="card-body">
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {{ form.hidden_tag() }}
+      {{ field(form.title) }}
+      {{ field(form.description, rows=3) }}
+      <div class="row">
+        <div class="col-md-6">{{ field(form.domain) }}</div>
+        <div class="col-md-6">{{ field(form.category) }}</div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">{{ field(form.content_type) }}</div>
+        <div class="col-md-3">{{ field(form.difficulty) }}</div>
+        <div class="col-md-3">{{ field(form.duration_minutes) }}</div>
+      </div>
+      <div id="urlGroup">{{ field(form.content_url) }}<small class="text-secondary">For YouTube content.</small></div>
+      <div id="fileGroup">{{ field(form.upload) }}<small class="text-secondary">For PDF / PPT / internal content.</small></div>
+      <div class="mt-3">{{ form.submit(class="btn btn-primary") }}
+      <a href="{{ url_for('learning.catalog') }}" class="btn btn-link">Cancel</a></div>
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}
+{% block scripts %}
+<script>
+function toggleFields() {
+  var t = document.getElementById("content_type").value;
+  document.getElementById("urlGroup").style.display = (t === "youtube") ? "block" : "none";
+  document.getElementById("fileGroup").style.display = (t === "youtube") ? "none" : "block";
+}
+document.getElementById("content_type").addEventListener("change", toggleFields);
+toggleFields();
+</script>
+{% endblock %}

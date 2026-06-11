@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Badges{% endblock %}
+{% block heading %}{{ employee.full_name }} · Badges{% endblock %}
+{% block content %}
+<div class="row g-3">
+  {% for eb, badge in earned %}
+  <div class="col-md-6 col-lg-4"><div class="card h-100 border-success"><div class="card-body text-center">
+    <i class="bi bi-award-fill display-5 text-warning"></i>
+    <h6 class="mt-2">{{ badge.name }}</h6>
+    <p class="small text-secondary">{{ badge.description }}</p>
+    <span class="small text-muted">{{ eb.awarded_at.strftime('%Y-%m-%d') }}</span>
+  </div></div></div>
+  {% else %}<div class="col-12"><div class="alert alert-info">No badges earned yet.</div></div>{% endfor %}
+</div>
+{% endblock %}

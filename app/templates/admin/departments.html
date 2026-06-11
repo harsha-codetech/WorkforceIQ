@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}Departments{% endblock %}
+{% block heading %}Departments{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-5"><div class="card"><div class="card-body">
+    <h6 class="mb-3">Add department</h6>
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      {{ field(form.name) }}
+      {{ form.submit(class="btn btn-primary") }}
+    </form>
+  </div></div></div>
+  <div class="col-lg-7"><div class="card"><div class="card-body">
+    <h6 class="mb-3">Existing departments</h6>
+    <ul class="list-group list-group-flush">
+      {% for d in departments %}
+      <li class="list-group-item px-0">{{ d.name }}</li>
+      {% else %}<li class="list-group-item px-0 text-secondary">No departments yet.</li>{% endfor %}
+    </ul>
+  </div></div></div>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Assessments{% endblock %}
+{% block heading %}Assessment Management{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h5 class="mb-0">Assessments</h5>
+  <div>
+    <a href="{{ url_for('assessments.grading_queue') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-pencil-square"></i> Grading queue</a>
+    <a href="{{ url_for('assessments.create') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> New assessment</a>
+  </div>
+</div>
+<div class="card"><div class="card-body">
+  <div class="table-responsive"><table class="table align-middle">
+    <thead><tr><th>Title</th><th>Type</th><th>Grading</th><th>Marks</th><th>Pass %</th><th></th></tr></thead>
+    <tbody>
+      {% for a in assessments %}
+      <tr>
+        <td class="fw-semibold">{{ a.title }}</td>
+        <td class="text-uppercase">{{ a.type }}</td>
+        <td><span class="badge bg-{{ 'success' if a.grading_mode == 'auto' else 'warning' }}">{{ a.grading_mode }}</span></td>
+        <td>{{ a.total_marks }}</td>
+        <td>{{ a.pass_percentage }}</td>
+        <td class="text-nowrap">
+          <a href="{{ url_for('assessments.manage', assessment_id=a.id) }}" class="btn btn-sm btn-outline-secondary">Manage</a>
+          <a href="{{ url_for('assessments.assign', assessment_id=a.id) }}" class="btn btn-sm btn-outline-primary">Assign</a>
+          <a href="{{ url_for('assessments.analytics', assessment_id=a.id) }}" class="btn btn-sm btn-outline-secondary">Analytics</a>
+        </td>
+      </tr>
+      {% else %}<tr><td colspan="6" class="text-secondary">No assessments yet.</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</div></div>
+{% endblock %}

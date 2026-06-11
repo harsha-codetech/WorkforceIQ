@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}{{ 'Edit' if mode == 'edit' else 'New' }} user{% endblock %}
+{% block heading %}{{ 'Edit user' if mode == 'edit' else 'New user' }}{% endblock %}
+{% block content %}
+<div class="row"><div class="col-lg-7">
+  <div class="card"><div class="card-body">
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      {{ field(form.full_name) }}
+      {{ field(form.email) }}
+      <div class="row"><div class="col-md-6">{{ field(form.role) }}</div><div class="col-md-6">{{ field(form.status) }}</div></div>
+      <div class="row"><div class="col-md-6">{{ field(form.department_id) }}</div><div class="col-md-6">{{ field(form.manager_id) }}</div></div>
+      {{ field(form.password) }}
+      <p class="text-secondary small">{{ 'Leave password blank to keep the current one.' if mode == 'edit' else 'Set an initial password (min 8 characters).' }}</p>
+      {{ form.submit(class="btn btn-primary") }}
+      <a href="{{ url_for('main.users') }}" class="btn btn-link">Cancel</a>
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}

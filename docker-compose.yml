@@ -1,0 +1,38 @@
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: workforceiq
+    # No host port mapping: the web service reaches MySQL over the internal
+    # Docker network (db:3306). To inspect the DB from a host client, uncomment
+    # below and use a free host port, e.g. 3307 -> connect to localhost:3307.
+    # ports:
+    #   - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      FLASK_CONFIG: production
+      SECRET_KEY: change-this-in-production
+      SESSION_COOKIE_SECURE: "0"
+      DATABASE_URL: mysql+pymysql://root:root@db:3306/workforceiq?charset=utf8mb4
+    ports:
+      - "5000:5000"
+    command: >
+      sh -c "flask --app wsgi seed-demo &&
+             gunicorn --bind 0.0.0.0:5000 --workers 3 wsgi:app"
+
+volumes:
+  db_data:

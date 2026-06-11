@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}Skill Catalog{% endblock %}
+{% block heading %}Skill Catalog{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-5"><div class="card"><div class="card-body">
+    <h6 class="mb-3">Add skill</h6>
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      {{ field(form.name) }}
+      {{ field(form.domain) }}
+      {{ form.submit(class="btn btn-primary") }}
+    </form>
+  </div></div></div>
+  <div class="col-lg-7"><div class="card"><div class="card-body">
+    <h6 class="mb-3">Catalog ({{ skills|length }})</h6>
+    <ul class="list-group list-group-flush">
+      {% for s in skills %}
+      <li class="list-group-item d-flex justify-content-between px-0">{{ s.name }}
+        <span class="badge bg-light text-dark border text-capitalize">{{ s.domain.replace('_',' ') if s.domain else '—' }}</span></li>
+      {% else %}<li class="list-group-item px-0 text-secondary">No skills yet.</li>{% endfor %}
+    </ul>
+  </div></div></div>
+</div>
+{% endblock %}

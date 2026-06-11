@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}{{ assessment.title }}{% endblock %}
+{% block heading %}Manage · {{ assessment.title }}{% endblock %}
+{% block content %}
+<div class="mb-3">
+  <a href="{{ url_for('assessments.assign', assessment_id=assessment.id) }}" class="btn btn-sm btn-primary">Assign to employees</a>
+  <a href="{{ url_for('assessments.analytics', assessment_id=assessment.id) }}" class="btn btn-sm btn-outline-secondary">Analytics</a>
+</div>
+{% if assessment.type == 'mcq' %}
+<div class="row g-3">
+  <div class="col-lg-6"><div class="card"><div class="card-body">
+    <h6 class="mb-3">Add MCQ question</h6>
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      {{ field(form.question_text, rows=2) }}
+      <div class="row"><div class="col-6">{{ field(form.option_a) }}</div><div class="col-6">{{ field(form.option_b) }}</div></div>
+      <div class="row"><div class="col-6">{{ field(form.option_c) }}</div><div class="col-6">{{ field(form.option_d) }}</div></div>
+      <div class="row"><div class="col-6">{{ field(form.correct_option) }}</div><div class="col-6">{{ field(form.marks) }}</div></div>
+      {{ form.submit(class="btn btn-primary") }}
+    </form>
+  </div></div></div>
+  <div class="col-lg-6"><div class="card"><div class="card-body">
+    <h6 class="mb-3">Questions ({{ assessment.questions|length }})</h6>
+    <ol class="ps-3">
+      {% for q in assessment.questions %}
+      <li class="mb-2"><strong>{{ q.question_text }}</strong>
+        <div class="small text-secondary">Correct: {{ q.correct_option }} · {{ q.marks }} mark(s)</div>
+      </li>
+      {% else %}<p class="text-secondary">No questions yet.</p>{% endfor %}
+    </ol>
+  </div></div></div>
+</div>
+{% else %}
+<div class="alert alert-info">This is a <strong>{{ assessment.type }}</strong> assessment. Employees submit work for manual grading; no MCQ questions are required.</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,117 @@
+:root {
+  --wiq-primary: #1f3a5f;
+  --wiq-accent: #2d72d9;
+  --wiq-bg: #f4f6fa;
+  --wiq-sidebar: #16243b;
+}
+
+body {
+  background: var(--wiq-bg);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  color: #1d2733;
+}
+
+/* Sidebar */
+.wiq-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 240px;
+  background: var(--wiq-sidebar);
+  color: #c7d2e0;
+  display: flex;
+  flex-direction: column;
+  z-index: 1030;
+  overflow-y: auto;
+}
+.wiq-sidebar .brand {
+  padding: 1.1rem 1.25rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.wiq-sidebar .nav-link {
+  color: #aeb9c9;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.wiq-sidebar .nav-link:hover,
+.wiq-sidebar .nav-link.active {
+  background: rgba(45, 114, 217, 0.18);
+  color: #fff;
+  border-left: 3px solid var(--wiq-accent);
+}
+.wiq-sidebar .nav-section {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #5d6b80;
+  padding: 0.9rem 1.25rem 0.3rem;
+}
+
+.wiq-main {
+  margin-left: 240px;
+  min-height: 100vh;
+}
+.wiq-topbar {
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.65rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+}
+.wiq-content {
+  padding: 1.5rem;
+}
+
+.card {
+  border: 1px solid #e6ebf2;
+  border-radius: 0.6rem;
+  box-shadow: 0 1px 2px rgba(16, 30, 54, 0.04);
+}
+.stat-card .stat-value {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--wiq-primary);
+}
+.stat-card .stat-label {
+  color: #6b7787;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.score-ring {
+  font-size: 2.6rem;
+  font-weight: 800;
+}
+.cat-elite { color: #6d28d9; }
+.cat-high_performer { color: #0d9488; }
+.cat-good { color: #2563eb; }
+.cat-needs_improvement { color: #d97706; }
+.cat-critical { color: #dc2626; }
+
+.badge-pill { font-weight: 600; }
+.btn-primary { background: var(--wiq-accent); border-color: var(--wiq-accent); }
+.btn-primary:hover { background: #245fbb; border-color: #245fbb; }
+a { text-decoration: none; }
+
+.table thead th {
+  background: #f0f3f8;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #56627a;
+}
+
+@media (max-width: 992px) {
+  .wiq-sidebar { transform: translateX(-100%); transition: transform 0.2s; }
+  .wiq-sidebar.open { transform: translateX(0); }
+  .wiq-main { margin-left: 0; }
+}

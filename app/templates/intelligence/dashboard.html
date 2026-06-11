@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Workforce Intelligence{% endblock %}
+{% block heading %}Workforce Intelligence{% endblock %}
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-md-3"><div class="card stat-card"><div class="card-body"><div class="stat-label">Total Learning Hours</div><div class="stat-value">{{ total_hours }}</div></div></div></div>
+  <div class="col-md-3"><div class="card stat-card"><div class="card-body"><div class="stat-label">Avg Assessment</div><div class="stat-value">{{ avg_assessment }}%</div></div></div></div>
+  <div class="col-md-3"><div class="card stat-card"><div class="card-body"><div class="stat-label">Goal Completion</div><div class="stat-value">{{ goal_rate }}%</div></div></div></div>
+  <div class="col-md-3"><div class="card stat-card"><div class="card-body"><div class="stat-label">Team Productivity</div><div class="stat-value">{{ team_productivity }}</div></div></div></div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6"><div class="card h-100"><div class="card-body">
+    <h6 class="text-secondary mb-3">Module Completion Rates</h6>
+    <canvas id="completionChart" height="220"></canvas>
+  </div></div></div>
+  <div class="col-lg-6"><div class="card h-100"><div class="card-body">
+    <h6 class="text-secondary mb-3">Most Popular Modules</h6>
+    <canvas id="popularChart" height="220"></canvas>
+  </div></div></div>
+</div>
+
+<div class="row g-3 mt-1">
+  <div class="col-lg-6"><div class="card"><div class="card-body">
+    <h6 class="text-secondary mb-3">Top Learners</h6>
+    <ol class="ps-3 mb-0">
+      {% for emp, s in top_learners %}
+      <li class="mb-1 d-flex justify-content-between"><span>{{ emp.full_name }}</span><strong>{{ s.components.learning }}</strong></li>
+      {% else %}<p class="text-secondary">No data.</p>{% endfor %}
+    </ol>
+  </div></div></div>
+  <div class="col-lg-6"><div class="card"><div class="card-body">
+    <h6 class="text-secondary mb-3">Goal Analytics</h6>
+    <p class="mb-1">Goals completed: <strong>{{ completed_goals }}/{{ total_goals }}</strong></p>
+    <p class="mb-1">Modules in catalog: <strong>{{ module_count }}</strong></p>
+    <p class="mb-0">Assessments: <strong>{{ assessment_count }}</strong></p>
+  </div></div></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+renderBar("completionChart",
+  {{ completion|map(attribute='title')|list|tojson }},
+  {{ completion|map(attribute='rate')|list|tojson }}, "Completion %");
+renderDoughnut("popularChart",
+  {{ popular|map(attribute=0)|list|tojson }},
+  {{ popular|map(attribute=1)|list|tojson }});
+</script>
+{% endblock %}

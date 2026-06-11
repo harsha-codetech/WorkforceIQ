@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from "_macros.html" import score_badge %}
+{% block title %}Leaderboard{% endblock %}
+{% block heading %}Leaderboard{% endblock %}
+{% block content %}
+<div class="btn-group mb-3">
+  {% for p in periods %}
+  <a href="{{ url_for('leaderboard.index', period=p) }}" class="btn btn-sm {{ 'btn-primary' if p == period else 'btn-outline-primary' }} text-capitalize">{{ p }}</a>
+  {% endfor %}
+</div>
+<p class="text-secondary small">Period: {{ start }} → {{ end }}</p>
+
+<div class="row g-3">
+  {% set boards = [('Top Learners', top_learners, 'learning'), ('Highest Assessment', top_assessment, 'assessment'), ('Goal Champions', goal_champions, 'goal'), ('Most Improved (Overall)', most_improved, 'overall')] %}
+  {% for title, board, key in boards %}
+  <div class="col-lg-6"><div class="card h-100"><div class="card-body">
+    <h6 class="text-secondary mb-3"><i class="bi bi-trophy text-warning"></i> {{ title }}</h6>
+    <table class="table table-sm align-middle mb-0">
+      <tbody>
+        {% for row in board %}
+        <tr>
+          <td style="width:30px;" class="fw-bold text-secondary">{{ loop.index }}</td>
+          <td>{{ row.employee.full_name }}</td>
+          <td class="text-end fw-bold">{{ row.score.components[key] if key != 'overall' else row.score.overall }}</td>
+          <td class="text-end">{{ score_badge(row.score.category) }}</td>
+        </tr>
+        {% else %}<tr><td class="text-secondary">No data.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div></div></div>
+  {% endfor %}
+</div>
+{% endblock %}

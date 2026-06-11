@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}New goal{% endblock %}
+{% block heading %}New goal{% endblock %}
+{% block content %}
+<div class="row"><div class="col-lg-6">
+  <div class="card"><div class="card-body">
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      {{ field(form.title) }}
+      {{ field(form.description, rows=2) }}
+      {{ field(form.type) }}
+      <div class="row"><div class="col-6">{{ field(form.start_date) }}</div><div class="col-6">{{ field(form.due_date) }}</div></div>
+      {{ form.submit(class="btn btn-primary") }}
+      <a href="{{ url_for('goals.index') }}" class="btn btn-link">Cancel</a>
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}

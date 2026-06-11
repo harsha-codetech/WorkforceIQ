@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}Sign in{% endblock %}
+{% block auth_content %}
+<div class="d-flex align-items-center justify-content-center vh-100" style="background:linear-gradient(135deg,#16243b,#2d72d9);">
+  <div class="card shadow-lg" style="width:400px;">
+    <div class="card-body p-4">
+      <div class="text-center mb-4">
+        <h3 class="fw-bold text-primary"><i class="bi bi-graph-up-arrow"></i> WorkforceIQ</h3>
+        <p class="text-secondary mb-0">Employee Growth & Performance Intelligence</p>
+      </div>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'danger' if category in ['error','danger'] else category }} py-2">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+      <form method="post" novalidate>
+        {{ form.hidden_tag() }}
+        {{ field(form.email) }}
+        {{ field(form.password) }}
+        <div class="d-grid">{{ form.submit(class="btn btn-primary") }}</div>
+      </form>
+      <div class="text-center mt-3">
+        <a href="{{ url_for('auth.forgot_password') }}" class="small">Forgot your password?</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

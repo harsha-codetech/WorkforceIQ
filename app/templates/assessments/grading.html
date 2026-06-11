@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Grading queue{% endblock %}
+{% block heading %}Grading Queue{% endblock %}
+{% block content %}
+<div class="card"><div class="card-body">
+  <div class="table-responsive"><table class="table align-middle">
+    <thead><tr><th>Employee</th><th>Assessment</th><th>Type</th><th>Submitted</th><th>Attempt</th><th></th></tr></thead>
+    <tbody>
+      {% for a in attempts %}
+      <tr>
+        <td class="fw-semibold">{{ a.employee.full_name }}</td>
+        <td>{{ a.assessment.title }}</td>
+        <td class="text-uppercase">{{ a.assessment.type }}</td>
+        <td class="small">{{ a.submitted_at.strftime('%Y-%m-%d %H:%M') if a.submitted_at else '—' }}</td>
+        <td>#{{ a.attempt_number }}</td>
+        <td><a href="{{ url_for('assessments.grade', attempt_id=a.id) }}" class="btn btn-sm btn-primary">Grade</a></td>
+      </tr>
+      {% else %}<tr><td colspan="6" class="text-secondary">Nothing awaiting grading.</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</div></div>
+{% endblock %}

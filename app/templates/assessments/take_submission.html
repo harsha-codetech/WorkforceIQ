@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}{{ assessment.title }}{% endblock %}
+{% block heading %}{{ assessment.title }}{% endblock %}
+{% block content %}
+<div class="row"><div class="col-lg-7">
+  <div class="card"><div class="card-body">
+    <p class="text-secondary">{{ assessment.description }}</p>
+    <div class="alert alert-info small">This is a <strong>{{ assessment.type }}</strong> submission and will be graded manually by an administrator.</div>
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {{ form.hidden_tag() }}
+      {{ field(form.submission_url) }}
+      {{ field(form.upload) }}
+      {{ form.submit(class="btn btn-primary") }}
+      <a href="{{ url_for('assessments.index') }}" class="btn btn-link">Cancel</a>
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}

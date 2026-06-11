@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Learning Modules{% endblock %}
+{% block heading %}Learning Management{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h5 class="mb-0">Modules</h5>
+  <a href="{{ url_for('learning.module_new') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Add module</a>
+</div>
+<div class="card"><div class="card-body">
+  <div class="table-responsive"><table class="table align-middle">
+    <thead><tr><th>Title</th><th>Domain</th><th>Type</th><th>Difficulty</th><th>Duration</th><th></th></tr></thead>
+    <tbody>
+      {% for m in modules %}
+      <tr>
+        <td class="fw-semibold">{{ m.title }}</td>
+        <td class="text-capitalize">{{ m.domain.replace('_',' ') }}</td>
+        <td class="text-uppercase">{{ m.content_type }}</td>
+        <td class="text-capitalize">{{ m.difficulty }}</td>
+        <td>{{ m.duration_minutes or '—' }} min</td>
+        <td class="text-nowrap">
+          <a href="{{ url_for('learning.module_detail', module_id=m.id) }}" class="btn btn-sm btn-outline-secondary">View</a>
+          <a href="{{ url_for('learning.assign', module_id=m.id) }}" class="btn btn-sm btn-outline-primary">Assign</a>
+        </td>
+      </tr>
+      {% else %}<tr><td colspan="6" class="text-secondary">No modules yet.</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</div></div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "_macros.html" import score_badge %}
+{% block title %}Team Dashboard{% endblock %}
+{% block heading %}Team Performance{% endblock %}
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-md-4"><div class="card stat-card"><div class="card-body">
+    <div class="stat-label">Team Members</div><div class="stat-value">{{ team|length }}</div>
+  </div></div></div>
+  <div class="col-md-4"><div class="card stat-card"><div class="card-body">
+    <div class="stat-label">Avg Growth Score</div><div class="stat-value">{{ team_avg }}</div>
+  </div></div></div>
+  <div class="col-md-4"><div class="card stat-card"><div class="card-body">
+    <div class="stat-label">Workforce Intel</div>
+    <a href="{{ url_for('intelligence.dashboard') }}" class="btn btn-sm btn-primary mt-2">Open analytics</a>
+  </div></div></div>
+</div>
+
+<div class="card"><div class="card-body">
+  <h6 class="text-secondary mb-3">Direct Reports</h6>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th>Employee</th><th>Learning</th><th>Assessment</th><th>Goals</th><th>Overall</th><th>Category</th><th></th></tr></thead>
+      <tbody>
+        {% for member, s in scores %}
+        <tr>
+          <td class="fw-semibold">{{ member.full_name }}<div class="small text-secondary">{{ member.email }}</div></td>
+          <td>{{ s.components.learning }}</td>
+          <td>{{ s.components.assessment }}</td>
+          <td>{{ s.components.goal }}</td>
+          <td class="fw-bold cat-{{ s.category }}">{{ s.overall }}</td>
+          <td>{{ score_badge(s.category) }}</td>
+          <td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('main.employee_profile', employee_id=member.id) }}">View</a></td>
+        </tr>
+        {% else %}<tr><td colspan="7" class="text-secondary">No team members assigned.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div></div>
+{% endblock %}

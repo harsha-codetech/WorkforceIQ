@@ -1,0 +1,24 @@
+{% macro field(f, rows=0) %}
+  <div class="mb-3">
+    {{ f.label(class="form-label fw-semibold") }}
+    {% if rows %}
+      {{ f(class="form-control" + (" is-invalid" if f.errors else ""), rows=rows) }}
+    {% elif f.type == 'SelectField' or f.type == 'SelectMultipleField' %}
+      {{ f(class="form-select" + (" is-invalid" if f.errors else "")) }}
+    {% elif f.type == 'BooleanField' %}
+      {{ f(class="form-check-input") }}
+    {% else %}
+      {{ f(class="form-control" + (" is-invalid" if f.errors else "")) }}
+    {% endif %}
+    {% for e in f.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+  </div>
+{% endmacro %}
+
+{% macro score_badge(category) %}
+  <span class="badge badge-pill cat-{{ category }} bg-light border">{{ category.replace('_', ' ').title() }}</span>
+{% endmacro %}
+
+{% macro status_badge(status) %}
+  {% set colors = {'completed':'success','in_progress':'info','pending':'secondary','missed':'danger','assigned':'secondary','submitted':'warning','graded':'success','pass':'success','fail':'danger','active':'success','inactive':'secondary'} %}
+  <span class="badge bg-{{ colors.get(status, 'secondary') }}">{{ status.replace('_',' ').title() }}</span>
+{% endmacro %}

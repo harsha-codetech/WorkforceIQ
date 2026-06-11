@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}Grade submission{% endblock %}
+{% block heading %}Grade · {{ attempt.assessment.title }}{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-5"><div class="card"><div class="card-body">
+    <h6 class="text-secondary">Submission</h6>
+    <dl class="row small">
+      <dt class="col-4">Employee</dt><dd class="col-8">{{ attempt.employee.full_name }}</dd>
+      <dt class="col-4">Type</dt><dd class="col-8 text-uppercase">{{ attempt.assessment.type }}</dd>
+      <dt class="col-4">Total marks</dt><dd class="col-8">{{ attempt.assessment.total_marks }}</dd>
+      <dt class="col-4">Link</dt><dd class="col-8">{% if attempt.submission_url %}<a href="{{ attempt.submission_url }}" target="_blank">Open link</a>{% else %}—{% endif %}</dd>
+      <dt class="col-4">File</dt><dd class="col-8">{% if download_url %}<a href="{{ download_url }}" target="_blank">Download file</a>{% else %}—{% endif %}</dd>
+    </dl>
+  </div></div></div>
+  <div class="col-lg-7"><div class="card"><div class="card-body">
+    <h6 class="text-secondary mb-3">Grade</h6>
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      {{ field(form.score) }}
+      <small class="text-secondary">Out of {{ attempt.assessment.total_marks }} marks.</small>
+      {{ field(form.feedback, rows=4) }}
+      {{ form.submit(class="btn btn-primary") }}
+      <a href="{{ url_for('assessments.grading_queue') }}" class="btn btn-link">Cancel</a>
+    </form>
+  </div></div></div>
+</div>
+{% endblock %}

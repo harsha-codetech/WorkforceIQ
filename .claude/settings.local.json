@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import pdfplumber; pdf=pdfplumber.open\\('WorkforceIQ™ – Employee Growth & Performance Intelligence Platform SRS.pdf'\\); print\\('PAGES',len\\(pdf.pages\\)\\); [print\\('\\\\n===== PAGE',i+1,'=====\\\\n', p.extract_text\\(\\)\\) for i,p in enumerate\\(pdf.pages\\)]\")"
+    ]
+  }
+}

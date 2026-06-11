@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.git
+app/static/uploads/*
+*.log
+*.pdf
+srs_text.txt

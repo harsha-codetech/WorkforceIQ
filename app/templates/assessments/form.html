@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}New assessment{% endblock %}
+{% block heading %}Create assessment{% endblock %}
+{% block content %}
+<div class="row"><div class="col-lg-8">
+  <div class="card"><div class="card-body">
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      {{ field(form.title) }}
+      {{ field(form.description, rows=3) }}
+      <div class="row">
+        <div class="col-md-6">{{ field(form.type) }}</div>
+        <div class="col-md-6">{{ field(form.domain) }}</div>
+      </div>
+      <div class="row">
+        <div class="col-md-3">{{ field(form.total_marks) }}</div>
+        <div class="col-md-3">{{ field(form.pass_percentage) }}</div>
+        <div class="col-md-3">{{ field(form.duration_minutes) }}</div>
+        <div class="col-md-3">{{ field(form.max_attempts) }}</div>
+      </div>
+      {{ field(form.scheduled_at) }}
+      <p class="text-secondary small">MCQ is auto-graded. Coding, practical and project types are graded manually.</p>
+      {{ form.submit(class="btn btn-primary") }}
+    </form>
+  </div></div>
+</div></div>
+{% endblock %}

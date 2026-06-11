@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Assessments{% endblock %}
+{% block heading %}My Assessments{% endblock %}
+{% block content %}
+<div class="row g-3">
+  {% for assignment, a in assigned %}
+  {% set tries = attempts.get(a.id, []) %}
+  <div class="col-md-6 col-lg-4"><div class="card h-100"><div class="card-body d-flex flex-column">
+    <div class="d-flex justify-content-between">
+      <span class="badge bg-light text-dark border text-uppercase">{{ a.type }}</span>
+      {{ status_badge(assignment.status) }}
+    </div>
+    <h6 class="mt-2">{{ a.title }}</h6>
+    <p class="small text-secondary flex-grow-1">{{ a.description or '' }}</p>
+    <div class="small text-secondary mb-2">Attempts: {{ tries|length }}/{{ a.max_attempts }} · Pass {{ a.pass_percentage }}%</div>
+    {% if tries %}
+      {% set best = tries|map(attribute='percentage')|select('!=', None)|list %}
+      {% if best %}<div class="small mb-2">Best: <strong>{{ best|max }}%</strong></div>{% endif %}
+    {% endif %}
+    <div class="d-flex gap-2">
+      {% if tries|length < a.max_attempts %}
+      <a href="{{ url_for('assessments.take', assessment_id=a.id) }}" class="btn btn-sm btn-primary">{{ 'Reattempt' if tries else 'Start' }}</a>
+      {% endif %}
+      <a href="{{ url_for('assessments.analytics', assessment_id=a.id) }}" class="btn btn-sm btn-outline-secondary">Analytics</a>
+    </div>
+  </div></div></div>
+  {% else %}
+  <div class="col-12"><div class="alert alert-info">No assessments assigned yet.</div></div>
+  {% endfor %}
+</div>
+{% endblock %}

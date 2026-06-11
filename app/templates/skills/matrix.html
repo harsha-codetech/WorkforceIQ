@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Skill Matrix{% endblock %}
+{% block heading %}Skill Matrix{% endblock %}
+{% block content %}
+<div class="card"><div class="card-body">
+  <div class="table-responsive"><table class="table table-bordered align-middle">
+    <thead><tr><th>Employee</th>{% for s in skills %}<th class="small">{{ s.name }}</th>{% endfor %}</tr></thead>
+    <tbody>
+      {% for emp in employees %}
+      <tr>
+        <td class="fw-semibold"><a href="{{ url_for('skills.employee_matrix', employee_id=emp.id) }}">{{ emp.full_name }}</a></td>
+        {% for s in skills %}
+          {% set lvl = grid.get((emp.id, s.id)) %}
+          <td>{% if lvl %}<span class="badge bg-{{ {'beginner':'secondary','intermediate':'info','advanced':'primary','expert':'success'}[lvl] }}">{{ lvl[:3]|upper }}</span>{% else %}<span class="text-muted">—</span>{% endif %}</td>
+        {% endfor %}
+      </tr>
+      {% else %}<tr><td colspan="{{ skills|length + 1 }}" class="text-secondary">No employees in scope.</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</div></div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Badges{% endblock %}
+{% block heading %}Badge Overview{% endblock %}
+{% block content %}
+<div class="row g-3">
+  {% for b in catalog %}
+  <div class="col-md-6 col-lg-4"><div class="card h-100"><div class="card-body text-center">
+    <i class="bi bi-award-fill display-5 text-warning"></i>
+    <h6 class="mt-2">{{ b.name }}</h6>
+    <p class="small text-secondary">{{ b.description }}</p>
+    <span class="badge bg-primary">{{ counts.get(b.id, 0) }} earned</span>
+  </div></div></div>
+  {% endfor %}
+</div>
+{% endblock %}

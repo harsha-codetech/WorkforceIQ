@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Analytics{% endblock %}
+{% block heading %}Analytics · {{ assessment.title }}{% endblock %}
+{% block content %}
+<p class="text-secondary">Reattempt improvement analysis across attempts.</p>
+{% for emp_id, attempts in by_emp.items() %}
+{% set first = attempts[0].percentage|float %}
+{% set last = attempts[-1].percentage|float %}
+<div class="card mb-3"><div class="card-body">
+  <div class="d-flex justify-content-between">
+    <h6 class="mb-2">{{ users[emp_id].full_name if users.get(emp_id) else 'Employee #' ~ emp_id }}</h6>
+    {% if attempts|length > 1 %}
+    <span class="badge bg-{{ 'success' if last >= first else 'secondary' }}">Improvement: {{ (last - first)|round(1) }}%</span>
+    {% endif %}
+  </div>
+  <table class="table table-sm mb-0">
+    <thead><tr><th>Attempt</th><th>Score</th><th>%</th><th>Result</th><th>Time</th></tr></thead>
+    <tbody>
+      {% for a in attempts %}
+      <tr><td>#{{ a.attempt_number }}</td><td>{{ a.score }}</td><td>{{ a.percentage }}%</td>
+      <td>{{ status_badge(a.result) if a.result else '—' }}</td>
+      <td>{{ a.time_taken_seconds or 0 }}s</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% else %}
+<div class="alert alert-info">No attempts recorded yet.</div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Badges{% endblock %}
+{% block heading %}Achievement Badges{% endblock %}
+{% block content %}
+<form method="post" action="{{ url_for('badges.refresh') }}" class="mb-3">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button class="btn btn-sm btn-outline-primary"><i class="bi bi-arrow-clockwise"></i> Check for new badges</button>
+</form>
+<div class="row g-3">
+  {% for b in catalog %}
+  {% set earned = b.id in earned_ids %}
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 {{ 'border-success' if earned }}"><div class="card-body text-center">
+      <i class="bi bi-award-fill display-5 {{ 'text-warning' if earned else 'text-muted' }}"></i>
+      <h6 class="mt-2">{{ b.name }}</h6>
+      <p class="small text-secondary">{{ b.description }}</p>
+      {% if earned %}<span class="badge bg-success">Earned</span>{% else %}<span class="badge bg-light text-secondary border">Locked</span>{% endif %}
+    </div></div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
