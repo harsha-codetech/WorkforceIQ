@@ -4,11 +4,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: workforceiq
-    # No host port mapping: the web service reaches MySQL over the internal
-    # Docker network (db:3306). To inspect the DB from a host client, uncomment
-    # below and use a free host port, e.g. 3307 -> connect to localhost:3307.
-    # ports:
-    #   - "3307:3306"
+    ports:
+      - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
