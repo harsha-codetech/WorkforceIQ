@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}{{ domain.name }}{% endblock %}
+{% block heading %}{{ domain.name }}{% endblock %}
+{% block content %}
+
+{# ── Banner ────────────────────────────────────────────────────────────────── #}
+<div class="lms-domain-hero mb-4" {% if banner_url %}style="background-image:linear-gradient(rgba(15,23,42,.55),rgba(15,23,42,.7)),url('{{ banner_url }}');background-size:cover;background-position:center"{% endif %}>
+  <div class="lms-domain-hero-body">
+    <h2 class="fw-bold text-white mb-2">{{ domain.name }}</h2>
+    {% if domain.description %}<p class="text-white-50 mb-3" style="max-width:580px">{{ domain.description }}</p>{% endif %}
+    <div class="d-flex flex-wrap gap-3">
+      <span class="lms-hero-stat"><i class="bi bi-journals"></i> {{ modules|length }} module{{ 's' if modules|length != 1 }}</span>
+      <span class="lms-hero-stat"><i class="bi bi-clock"></i> {{ total_hours }}h total</span>
+      {% if current_user.is_employee %}
+      <span class="lms-hero-stat"><i class="bi bi-check-circle"></i> {{ total_completed }} completed · {{ pct }}%</span>
+      {% endif %}
+    </div>
+  </div>
+  {% if current_user.is_admin %}
+  <div class="lms-domain-hero-actions">
+    <a href="{{ url_for('learning.domain_edit', domain_id=domain.id) }}" class="btn btn-sm btn-light"><i class="bi bi-pencil me-1"></i>Edit domain</a>
+  </div>
+  {% endif %}
+</div>
+
+{# ── Module grid ───────────────────────────────────────────────────────────── #}
+{% if current_user.is_admin %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="fw-bold mb-0">Modules in this domain</h5>
+  <a href="{{ url_for('learning.module_new') }}" class="btn btn-sm btn-primary"><i class="bi bi-plus-lg me-1"></i>Add module</a>
+</div>
+{% else %}
+<h5 class="fw-bold mb-3">Modules</h5>
+{% endif %}
+
+{% if modules %}
+<div class="row g-3">
+  {% for card in modules %}
+  {% set m = card.module %}
+  <div class="col-md-6 col-lg-4">
+    <a href="{{ url_for('learning.module_detail', module_id=m.id) }}" class="text-decoration-none">
+      <div class="lms-module-card h-100">
+        <div class="lms-module-thumb lms-thumb-{{ m.difficulty }}" {% if card.thumbnail_url %}style="background-image:url('{{ card.thumbnail_url }}');background-size:cover;background-position:center;background-color:transparent"{% endif %}>
+          {% if not card.thumbnail_url %}
+          {% if m.content_type == 'youtube' %}<i class="bi bi-play-circle-fill lms-thumb-icon"></i>
+          {% elif m.content_type == 'pdf' %}<i class="bi bi-file-earmark-pdf-fill lms-thumb-icon"></i>
+          {% elif m.content_type == 'ppt' %}<i class="bi bi-file-earmark-slides-fill lms-thumb-icon"></i>
+          {% else %}<i class="bi bi-book-fill lms-thumb-icon"></i>{% endif %}
+          {% endif %}
+        </div>
+        <div class="lms-module-body">
+          <div class="d-flex flex-wrap gap-1 mb-2">
+            <span class="lms-pill lms-pill-{{ m.difficulty }}">{{ m.difficulty.title() }}</span>
+            <span class="lms-pill lms-pill-type">{{ m.content_type.upper() }}</span>
+          </div>
+          <h6 class="lms-module-title">{{ m.title }}</h6>
+          <p class="lms-module-desc">{{ m.description[:80] ~ '…' if m.description and m.description|length > 80 else m.description or '' }}</p>
+
+          {% if not current_user.is_admin %}
+          <div class="lms-progress-wrap">
+            <div class="d-flex justify-content-between small text-secondary mb-1">
+              <span>{{ card.status.replace('_',' ').title() }}</span>
+              <span>{{ card.pct|round|int }}%</span>
+            </div>
+            <div class="progress lms-progress-bar">
+              <div class="progress-bar {{ 'bg-success' if card.status == 'completed' else 'bg-primary' }}" style="width:{{ card.pct }}%"></div>
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="lms-module-footer mt-2">
+            {% if m.duration_minutes %}<span class="small text-secondary"><i class="bi bi-clock"></i> {{ m.duration_minutes }} min</span>{% endif %}
+            <span class="ms-auto text-primary fw-semibold small">
+              {% if card.status == 'completed' %}<i class="bi bi-check-circle-fill text-success"></i> Done
+              {% elif card.status == 'in_progress' %}Resume <i class="bi bi-arrow-right"></i>
+              {% else %}Start <i class="bi bi-arrow-right"></i>{% endif %}
+            </span>
+          </div>
+
+          {% if current_user.is_admin %}
+          <div class="mt-2 pt-2 border-top d-flex gap-2">
+            <a href="{{ url_for('learning.assign', module_id=m.id) }}" class="btn btn-xs btn-outline-primary" onclick="event.stopPropagation()">Assign</a>
+            <a href="{{ url_for('learning.resource_new', module_id=m.id) }}" class="btn btn-xs btn-outline-secondary" onclick="event.stopPropagation()">+ Resource</a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="lms-empty-state">
+  <i class="bi bi-journals lms-empty-icon"></i>
+  <h6>No modules in this domain yet</h6>
+  {% if current_user.is_admin %}
+  <a href="{{ url_for('learning.module_new') }}" class="btn btn-sm btn-primary mt-2">Add first module</a>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

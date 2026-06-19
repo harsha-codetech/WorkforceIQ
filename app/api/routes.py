@@ -11,6 +11,8 @@ from app.models import (
     LearningModule,
     LearningProgress,
     ModuleAssignment,
+    ModuleResource,
+    ResourceProgress,
 )
 from app.utils.badges import evaluate_badges
 from app.utils.scoring import compute_growth_score
@@ -84,6 +86,73 @@ def update_progress(module_id):
             "completed": progress.status == "completed",
         }
     )
+
+
+@api_bp.route("/resources/<int:resource_id>/progress", methods=["POST"])
+@login_required
+def update_resource_progress(resource_id):
+    resource = db.session.get(ModuleResource, resource_id)
+    if not resource:
+        abort(400)
+
+    data = request.get_json(silent=True) or {}
+    try:
+        pct = max(0.0, min(100.0, float(data.get("percentage", 0))))
+    except (TypeError, ValueError):
+        abort(400)
+
+    rp = ResourceProgress.query.filter_by(
+        employee_id=current_user.id, resource_id=resource_id
+    ).first()
+    if not rp:
+        rp = ResourceProgress(employee_id=current_user.id, resource_id=resource_id)
+        db.session.add(rp)
+
+    rp.progress_percentage = max(float(rp.progress_percentage or 0), pct)
+    rp.last_activity_at = datetime.utcnow()
+    newly_completed = False
+    if pct >= 90 and not rp.completed:
+        rp.completed = True
+        newly_completed = True
+
+    _touch_activity(current_user.id)
+
+    # Check if all resources in the module are done → complete the module
+    if newly_completed:
+        module_id = resource.module_id
+        all_resources = ModuleResource.query.filter_by(module_id=module_id).all()
+        completed_ids = {
+            r.resource_id for r in ResourceProgress.query.filter(
+                ResourceProgress.employee_id == current_user.id,
+                ResourceProgress.resource_id.in_([r.id for r in all_resources]),
+                ResourceProgress.completed == True,
+            ).all()
+        }
+        # Include the current one
+        completed_ids.add(resource_id)
+        if len(completed_ids) >= len(all_resources):
+            progress = LearningProgress.query.filter_by(
+                employee_id=current_user.id, module_id=module_id
+            ).first()
+            if progress and progress.status != "completed":
+                progress.status = "completed"
+                progress.is_completed = True
+                progress.watch_percentage = 100
+                progress.completed_at = datetime.utcnow()
+                assignment = ModuleAssignment.query.filter_by(
+                    module_id=module_id, employee_id=current_user.id
+                ).first()
+                if assignment:
+                    assignment.status = "completed"
+
+    db.session.commit()
+    if newly_completed:
+        evaluate_badges(current_user.id)
+
+    return jsonify({
+        "progress_percentage": float(rp.progress_percentage),
+        "completed": rp.completed,
+    })
 
 
 @api_bp.route("/charts/score/<int:employee_id>")

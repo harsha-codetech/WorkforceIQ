@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Add Resource{% endblock %}
+{% block heading %}Add Resource — {{ module.title }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-body p-4">
+        <form method="post" enctype="multipart/form-data" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.title.label(class="form-label fw-semibold") }}
+            {{ form.title(class="form-control" + (' is-invalid' if form.title.errors else ''), placeholder="e.g. Intro Video, EC2 Lab Guide…") }}
+            {% for e in form.title.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.resource_type.label(class="form-label fw-semibold") }}
+            {{ form.resource_type(class="form-select", id="resourceType") }}
+          </div>
+          <div class="mb-3" id="urlField">
+            {{ form.video_url.label(class="form-label fw-semibold") }}
+            {{ form.video_url(class="form-control", placeholder="https://youtube.com/watch?v=…  or  https://example.com/resource") }}
+          </div>
+          <div class="mb-3" id="fileField">
+            {{ form.upload.label(class="form-label fw-semibold") }}
+            {{ form.upload(class="form-control") }}
+            <div class="form-text">PDF, PPT, PPTX, MP4, DOC, DOCX, ZIP, TXT</div>
+          </div>
+          <div class="mb-4">
+            {{ form.duration_minutes.label(class="form-label fw-semibold") }}
+            {{ form.duration_minutes(class="form-control", style="max-width:160px", placeholder="e.g. 15") }}
+          </div>
+          <div class="d-flex gap-2">
+            {{ form.submit(class="btn btn-primary px-4") }}
+            <a href="{{ url_for('learning.module_detail', module_id=module.id) }}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  var sel = document.getElementById("resourceType");
+  var urlF = document.getElementById("urlField");
+  var fileF = document.getElementById("fileField");
+  function toggle(){
+    var v = sel.value;
+    urlF.style.display = (v === "youtube" || v === "link") ? "" : "none";
+    fileF.style.display = (v === "youtube" || v === "link") ? "none" : "";
+  }
+  sel.addEventListener("change", toggle);
+  toggle();
+})();
+</script>
+{% endblock %}

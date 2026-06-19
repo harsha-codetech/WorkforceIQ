@@ -1,15 +1,121 @@
 {% extends "base.html" %}
-{% block title %}Badges{% endblock %}
+{% block title %}{{ employee.full_name }} · Badges{% endblock %}
 {% block heading %}{{ employee.full_name }} · Badges{% endblock %}
 {% block content %}
-<div class="row g-3">
-  {% for eb, badge in earned %}
-  <div class="col-md-6 col-lg-4"><div class="card h-100 border-success"><div class="card-body text-center">
-    <i class="bi bi-award-fill display-5 text-warning"></i>
-    <h6 class="mt-2">{{ badge.name }}</h6>
-    <p class="small text-secondary">{{ badge.description }}</p>
-    <span class="small text-muted">{{ eb.awarded_at.strftime('%Y-%m-%d') }}</span>
-  </div></div></div>
-  {% else %}<div class="col-12"><div class="alert alert-info">No badges earned yet.</div></div>{% endfor %}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+  <div class="profile-avatar-lg">{{ employee.full_name[0] }}</div>
+  <div>
+    <h4 class="fw-bold mb-0">{{ employee.full_name }}</h4>
+    <p class="text-secondary small mb-0">{{ detail|length }} badge{{ 's' if detail|length != 1 }} earned</p>
+  </div>
 </div>
+
+{% if detail %}
+
+{# Summary chips #}
+<div class="d-flex flex-wrap gap-2 mb-4">
+  {% for d in detail %}
+  <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2">
+    <i class="bi bi-award-fill me-1"></i>{{ d.badge.name }}
+  </span>
+  {% endfor %}
+</div>
+
+{# Timeline #}
+<h5 class="fw-bold mb-3">Badge Timeline</h5>
+<div class="badge-timeline">
+  {% for d in detail %}
+  <div class="badge-timeline-item"
+       data-bs-toggle="modal" data-bs-target="#badgeModal"
+       data-badge-name="{{ d.badge.name }}"
+       data-badge-desc="{{ d.badge.description }}"
+       data-badge-date="{{ d.eb.awarded_at.strftime('%B %d, %Y') }}"
+       data-badge-stats="{{ d.stats | join('|') }}"
+       data-badge-criteria="{{ d.badge.criteria }}">
+    <div class="badge-timeline-dot">
+      <i class="bi bi-award-fill"></i>
+    </div>
+    <div class="badge-timeline-line"></div>
+    <div class="badge-timeline-card">
+      <div class="d-flex align-items-start justify-content-between gap-3">
+        <div>
+          <h6 class="fw-bold mb-1">{{ d.badge.name }}</h6>
+          <p class="small text-secondary mb-2">{{ d.badge.description }}</p>
+          {% if d.stats %}
+          <div class="d-flex flex-wrap gap-2">
+            {% for s in d.stats %}
+            <span class="badge bg-light text-secondary border small">{{ s }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        <div class="text-end flex-shrink-0">
+          <div class="badge bg-success-subtle text-success border border-success-subtle mb-1">
+            <i class="bi bi-check-circle-fill me-1"></i>Earned
+          </div>
+          <div class="small text-secondary text-nowrap">{{ d.eb.awarded_at.strftime('%b %d, %Y') }}</div>
+        </div>
+      </div>
+      <div class="small text-primary mt-2 badge-timeline-hint">Click for details <i class="bi bi-arrow-right"></i></div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="lms-empty-state">
+  <i class="bi bi-award lms-empty-icon text-secondary"></i>
+  <h5>No badges yet</h5>
+  <p class="text-secondary">Keep learning and completing goals to earn badges.</p>
+</div>
+{% endif %}
+
+{# Badge detail modal #}
+<div class="modal fade" id="badgeModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-body p-0">
+        <div class="badge-modal-header text-center p-4">
+          <div class="badge-modal-icon mb-3"><i class="bi bi-award-fill"></i></div>
+          <h5 class="fw-bold text-white mb-1" id="modalBadgeName"></h5>
+          <p class="text-white-50 small mb-0" id="modalBadgeDesc"></p>
+        </div>
+        <div class="p-4">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-calendar-check text-success"></i>
+            <span class="small text-secondary">Awarded on</span>
+            <span class="fw-semibold small" id="modalBadgeDate"></span>
+          </div>
+          <h6 class="fw-semibold mb-2">Statistics</h6>
+          <ul class="list-unstyled mb-3" id="modalBadgeStats"></ul>
+          <div class="text-secondary small border-top pt-3" id="modalBadgeCriteria"></div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById("badgeModal").addEventListener("show.bs.modal", function(e){
+  var t = e.relatedTarget;
+  document.getElementById("modalBadgeName").textContent = t.dataset.badgeName;
+  document.getElementById("modalBadgeDesc").textContent = t.dataset.badgeDesc;
+  document.getElementById("modalBadgeDate").textContent = t.dataset.badgeDate;
+  document.getElementById("modalBadgeCriteria").textContent = "Criteria: " + t.dataset.badgeCriteria;
+  var ul = document.getElementById("modalBadgeStats");
+  ul.innerHTML = "";
+  (t.dataset.badgeStats || "").split("|").filter(Boolean).forEach(function(s){
+    var li = document.createElement("li");
+    li.className = "d-flex align-items-center gap-2 mb-1";
+    li.innerHTML = '<i class="bi bi-check2-circle text-success"></i><span class="small">' + s + '</span>';
+    ul.appendChild(li);
+  });
+});
+</script>
 {% endblock %}

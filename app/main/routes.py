@@ -11,10 +11,12 @@ from app.models import (
     AssessmentAttempt,
     Department,
     EmployeeBadge,
+    EmployeeSkill,
     Goal,
     LearningProgress,
     ModuleAssignment,
     PerformanceScore,
+    Skill,
     User,
 )
 from app.utils.scoring import compute_growth_score
@@ -71,6 +73,22 @@ def _employee_dashboard(employee_id):
         .order_by(EmployeeBadge.awarded_at.desc())
         .all()
     )
+    skills = (
+        db.session.query(EmployeeSkill, Skill)
+        .join(Skill, EmployeeSkill.skill_id == Skill.id)
+        .filter(EmployeeSkill.employee_id == employee_id)
+        .order_by(EmployeeSkill.level.desc())
+        .all()
+    )
+    recent_assessments = (
+        AssessmentAttempt.query.filter(
+            AssessmentAttempt.employee_id == employee_id,
+            AssessmentAttempt.percentage.isnot(None),
+        )
+        .order_by(AssessmentAttempt.submitted_at.desc())
+        .limit(5)
+        .all()
+    )
     return render_template(
         "dashboard/employee.html",
         employee=employee,
@@ -82,6 +100,8 @@ def _employee_dashboard(employee_id):
         weekly_goals=weekly_goals,
         monthly_goals=monthly_goals,
         badges=badges,
+        skills=skills,
+        recent_assessments=recent_assessments,
     )
 
 

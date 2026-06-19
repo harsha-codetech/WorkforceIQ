@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if mode == 'edit' else 'New' }} Domain{% endblock %}
+{% block heading %}{{ 'Edit' if mode == 'edit' else 'New' }} Learning Domain{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-body p-4">
+        <form method="post" enctype="multipart/form-data" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.name.label(class="form-label fw-semibold") }}
+            {{ form.name(class="form-control" + (' is-invalid' if form.name.errors else '')) }}
+            {% for e in form.name.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.description.label(class="form-label fw-semibold") }}
+            {{ form.description(class="form-control", rows=3, placeholder="Describe this learning domain…") }}
+          </div>
+          <div class="mb-3">
+            {{ form.banner_image.label(class="form-label fw-semibold") }}
+            <div class="small text-secondary mb-1">Recommended size: 1280 × 400 px</div>
+            {{ form.banner_image(class="form-control") }}
+            {% if mode == 'edit' and domain and domain.banner_image_key %}
+            <div class="mt-2 small text-success"><i class="bi bi-check-circle me-1"></i>Banner image uploaded</div>
+            {% endif %}
+          </div>
+          <div class="mb-4">
+            {{ form.thumbnail.label(class="form-label fw-semibold") }}
+            <div class="small text-secondary mb-1">Recommended size: 400 × 400 px (square)</div>
+            {{ form.thumbnail(class="form-control") }}
+            {% if mode == 'edit' and domain and domain.thumbnail_key %}
+            <div class="mt-2 small text-success"><i class="bi bi-check-circle me-1"></i>Thumbnail uploaded</div>
+            {% endif %}
+          </div>
+          <div class="d-flex gap-2">
+            {{ form.submit(class="btn btn-primary px-4") }}
+            <a href="{{ url_for('learning.domains') }}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

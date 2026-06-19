@@ -1,39 +1,58 @@
 {% extends "base.html" %}
 {% from "_macros.html" import field %}
-{% block title %}New module{% endblock %}
-{% block heading %}New learning module{% endblock %}
+{% block title %}{{ 'Edit' if mode == 'edit' else 'New' }} Module{% endblock %}
+{% block heading %}{{ 'Edit' if mode == 'edit' else 'New' }} Learning Module{% endblock %}
 {% block content %}
-<div class="row"><div class="col-lg-8">
-  <div class="card"><div class="card-body">
-    <form method="post" enctype="multipart/form-data" novalidate>
-      {{ form.hidden_tag() }}
-      {{ field(form.title) }}
-      {{ field(form.description, rows=3) }}
-      <div class="row">
-        <div class="col-md-6">{{ field(form.domain) }}</div>
-        <div class="col-md-6">{{ field(form.category) }}</div>
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body p-4">
+        <form method="post" enctype="multipart/form-data" novalidate>
+          {{ form.hidden_tag() }}
+          {{ field(form.title) }}
+          {{ field(form.description, rows=3) }}
+          <div class="row g-3 mb-2">
+            <div class="col-md-6">{{ field(form.domain) }}</div>
+            <div class="col-md-6">{{ field(form.domain_id) }}</div>
+          </div>
+          <div class="row g-3 mb-2">
+            <div class="col-md-4">{{ field(form.content_type) }}</div>
+            <div class="col-md-4">{{ field(form.difficulty) }}</div>
+            <div class="col-md-4">{{ field(form.duration_minutes) }}</div>
+          </div>
+          {{ field(form.category) }}
+          <div id="urlGroup" class="mb-3">
+            {{ field(form.content_url) }}
+            <div class="form-text">Paste a full YouTube URL, e.g. https://youtube.com/watch?v=…</div>
+          </div>
+          <div id="fileGroup" class="mb-3">
+            {{ field(form.upload) }}
+            <div class="form-text">PDF, PPT, PPTX, DOC, DOCX, ZIP, TXT, MD</div>
+          </div>
+          <div class="mb-4">
+            {{ field(form.thumbnail) }}
+            <div class="form-text">Optional card thumbnail — JPG, PNG or WebP, square preferred.</div>
+          </div>
+          <div class="d-flex gap-2">
+            {{ form.submit(class="btn btn-primary px-4") }}
+            <a href="{{ url_for('learning.catalog') }}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
       </div>
-      <div class="row">
-        <div class="col-md-6">{{ field(form.content_type) }}</div>
-        <div class="col-md-3">{{ field(form.difficulty) }}</div>
-        <div class="col-md-3">{{ field(form.duration_minutes) }}</div>
-      </div>
-      <div id="urlGroup">{{ field(form.content_url) }}<small class="text-secondary">For YouTube content.</small></div>
-      <div id="fileGroup">{{ field(form.upload) }}<small class="text-secondary">For PDF / PPT / internal content.</small></div>
-      <div class="mt-3">{{ form.submit(class="btn btn-primary") }}
-      <a href="{{ url_for('learning.catalog') }}" class="btn btn-link">Cancel</a></div>
-    </form>
-  </div></div>
-</div></div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 {% block scripts %}
 <script>
-function toggleFields() {
-  var t = document.getElementById("content_type").value;
-  document.getElementById("urlGroup").style.display = (t === "youtube") ? "block" : "none";
-  document.getElementById("fileGroup").style.display = (t === "youtube") ? "none" : "block";
-}
-document.getElementById("content_type").addEventListener("change", toggleFields);
-toggleFields();
+(function(){
+  function toggle(){
+    var t = document.getElementById("content_type").value;
+    document.getElementById("urlGroup").style.display = (t === "youtube") ? "" : "none";
+    document.getElementById("fileGroup").style.display = (t === "youtube") ? "none" : "";
+  }
+  document.getElementById("content_type").addEventListener("change", toggle);
+  toggle();
+})();
 </script>
 {% endblock %}

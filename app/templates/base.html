@@ -14,7 +14,8 @@
   <div class="brand"><i class="bi bi-graph-up-arrow"></i> WorkforceIQ</div>
   <div class="nav flex-column">
     <a class="nav-link {{ 'active' if request.endpoint == 'main.dashboard' }}" href="{{ url_for('main.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
-    <a class="nav-link" href="{{ url_for('learning.catalog') }}"><i class="bi bi-mortarboard"></i> Learning</a>
+    <a class="nav-link {{ 'active' if 'learning' in request.endpoint }}" href="{{ url_for('learning.catalog') }}"><i class="bi bi-mortarboard"></i> Learning</a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'learning.domains' or request.endpoint == 'learning.domain_detail' }}" href="{{ url_for('learning.domains') }}"><i class="bi bi-collection"></i> Domains</a>
     <a class="nav-link" href="{{ url_for('assessments.index') }}"><i class="bi bi-clipboard-check"></i> Assessments</a>
     {% if current_user.is_employee %}
     <a class="nav-link" href="{{ url_for('goals.index') }}"><i class="bi bi-bullseye"></i> Goals</a>

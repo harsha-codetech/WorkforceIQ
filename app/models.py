@@ -15,6 +15,7 @@ DOMAINS = (
     "soft_skills",
 )
 LEVELS = ("beginner", "intermediate", "advanced", "expert")
+RESOURCE_TYPES = ("youtube", "mp4", "pdf", "ppt", "assignment", "link")
 
 
 # BigInteger auto-increment works on MySQL natively; on SQLite (tests) it must
@@ -133,9 +134,13 @@ class LearningModule(db.Model):
     description = db.Column(db.Text)
     category = db.Column(db.String(100))
     domain = db.Column(_enum(*DOMAINS), nullable=False)
+    domain_id = db.Column(
+        db.BigInteger, db.ForeignKey("domains.id", ondelete="SET NULL"), nullable=True
+    )
     content_type = db.Column(_enum("youtube", "pdf", "ppt", "internal"), nullable=False)
     content_url = db.Column(db.String(500))
     file_key = db.Column(db.String(500))
+    thumbnail_key = db.Column(db.String(500))
     duration_minutes = db.Column(db.Integer)
     difficulty = db.Column(_enum(*LEVELS), default="beginner", nullable=False)
     created_by = db.Column(BIGINT, db.ForeignKey("users.id"), nullable=False)
@@ -143,6 +148,11 @@ class LearningModule(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated_at = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )
+
+    resources = db.relationship(
+        "ModuleResource", backref="module", lazy=True,
+        order_by="ModuleResource.display_order", cascade="all, delete-orphan"
     )
 
     @property
@@ -202,6 +212,57 @@ class LearningActivity(db.Model):
     )
     activity_date = db.Column(db.Date, nullable=False)
     active_minutes = db.Column(db.Integer, default=0, nullable=False)
+
+
+class Domain(db.Model):
+    __tablename__ = "domains"
+    id = db.Column(BIGINT, primary_key=True)
+    name = db.Column(db.String(120), nullable=False, unique=True)
+    slug = db.Column(db.String(120), nullable=False, unique=True)
+    description = db.Column(db.Text)
+    banner_image_key = db.Column(db.String(500))
+    thumbnail_key = db.Column(db.String(500))
+    created_by = db.Column(BIGINT, db.ForeignKey("users.id"), nullable=False)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )
+
+    modules = db.relationship(
+        "LearningModule", foreign_keys="LearningModule.domain_id",
+        backref="lms_domain", lazy="dynamic"
+    )
+
+
+class ModuleResource(db.Model):
+    __tablename__ = "module_resources"
+    id = db.Column(BIGINT, primary_key=True)
+    module_id = db.Column(
+        db.BigInteger, db.ForeignKey("learning_modules.id", ondelete="CASCADE"), nullable=False
+    )
+    title = db.Column(db.String(200), nullable=False)
+    resource_type = db.Column(_enum(*RESOURCE_TYPES), nullable=False)
+    video_url = db.Column(db.String(500))
+    file_key = db.Column(db.String(500))
+    duration_minutes = db.Column(db.Integer)
+    display_order = db.Column(db.Integer, default=0, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+
+class ResourceProgress(db.Model):
+    __tablename__ = "resource_progress"
+    __table_args__ = (db.UniqueConstraint("employee_id", "resource_id", name="uq_rp"),)
+    id = db.Column(BIGINT, primary_key=True)
+    employee_id = db.Column(
+        db.BigInteger, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    resource_id = db.Column(
+        db.BigInteger, db.ForeignKey("module_resources.id", ondelete="CASCADE"), nullable=False
+    )
+    progress_percentage = db.Column(db.Numeric(5, 2), default=0, nullable=False)
+    completed = db.Column(db.Boolean, default=False, nullable=False)
+    last_activity_at = db.Column(db.DateTime)
 
 
 # --------------------------------------------------------------------------- #

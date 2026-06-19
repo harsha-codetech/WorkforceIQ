@@ -9,6 +9,8 @@ ALLOWED = {
     "ppt": {"ppt", "pptx"},
     "internal": {"pdf", "ppt", "pptx", "doc", "docx", "zip", "txt", "md"},
     "submission": {"pdf", "zip", "doc", "docx", "txt", "py", "ipynb", "md"},
+    "resource": {"pdf", "ppt", "pptx", "mp4", "doc", "docx", "zip", "txt", "md"},
+    "image": {"jpg", "jpeg", "png", "gif", "webp"},
 }
 
 

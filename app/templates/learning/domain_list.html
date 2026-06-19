@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Learning Domains{% endblock %}
+{% block heading %}Learning Domains{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-1">Explore Domains</h4>
+    <p class="text-secondary mb-0 small">Browse all available learning tracks</p>
+  </div>
+  {% if current_user.is_admin %}
+  <a href="{{ url_for('learning.domain_new') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>New Domain</a>
+  {% endif %}
+</div>
+
+{% if domain_cards %}
+<div class="row g-4">
+  {% for d in domain_cards %}
+  <div class="col-md-6 col-lg-4">
+    <div class="lms-domain-card-lg h-100"
+         onclick="window.location='{{ url_for('learning.domain_detail', domain_id=d.domain.id) }}'"
+         style="cursor:pointer">
+      <div class="lms-domain-banner" {% if d.thumbnail_url %}style="background-image:url('{{ d.thumbnail_url }}');background-size:cover;background-position:center"{% endif %}>
+        {% if not d.thumbnail_url %}
+        <i class="bi bi-collection-fill" style="font-size:2.5rem;opacity:.6"></i>
+        {% endif %}
+      </div>
+      <div class="lms-domain-card-body">
+        <h5 class="fw-bold mb-1">{{ d.domain.name }}</h5>
+        <p class="text-secondary small mb-3">{{ d.domain.description[:100] ~ '…' if d.domain.description and d.domain.description|length > 100 else d.domain.description or 'No description.' }}</p>
+        <div class="d-flex gap-3 mb-3 small">
+          <span><i class="bi bi-journals text-primary me-1"></i>{{ d.total }} module{{ 's' if d.total != 1 }}</span>
+          <span><i class="bi bi-clock text-secondary me-1"></i>{{ d.total_hours }}h</span>
+        </div>
+        {% if current_user.is_employee %}
+        <div class="d-flex justify-content-between small text-secondary mb-1">
+          <span>{{ d.done }}/{{ d.total }} completed</span>
+          <span>{{ d.pct }}%</span>
+        </div>
+        <div class="progress lms-progress-bar mb-3">
+          <div class="progress-bar {{ 'bg-success' if d.pct == 100 else 'bg-primary' }}" style="width:{{ d.pct }}%"></div>
+        </div>
+        {% endif %}
+        <div class="lms-domain-cta">
+          {{ 'Continue' if d.pct > 0 else 'Start Learning' }} <i class="bi bi-arrow-right ms-1"></i>
+        </div>
+      </div>
+      {% if current_user.is_admin %}
+      <div class="lms-domain-admin-bar" onclick="event.stopPropagation()">
+        <a href="{{ url_for('learning.domain_edit', domain_id=d.domain.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+        <form method="post" action="{{ url_for('learning.domain_archive', domain_id=d.domain.id) }}" class="d-inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Archive this domain?')">Archive</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="lms-empty-state">
+  <i class="bi bi-collection lms-empty-icon"></i>
+  <h5>No domains yet</h5>
+  {% if current_user.is_admin %}
+  <p class="text-secondary">Create your first learning domain to get started.</p>
+  <a href="{{ url_for('learning.domain_new') }}" class="btn btn-primary mt-2">Create domain</a>
+  {% else %}
+  <p class="text-secondary">No learning domains have been published yet.</p>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}
