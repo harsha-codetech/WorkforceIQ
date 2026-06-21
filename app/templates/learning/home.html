@@ -3,7 +3,18 @@
 {% block heading %}My Learning{% endblock %}
 {% block content %}
 
-{# ── Stats bar ──────────────────────────────────────────────────────────── #}
+{# ── Hero greeting ────────────────────────────────────────────────────────── #}
+<div class="lms-home-hero mb-4">
+  <div>
+    <h4 class="fw-bold mb-1 text-white">Welcome back, {{ current_user.full_name.split()[0] }}</h4>
+    <p class="mb-0 small" style="color:rgba(255,255,255,.75)">Pick up where you left off or discover something new.</p>
+  </div>
+  <a href="{{ url_for('learning.domains') }}" class="btn btn-light btn-sm fw-semibold">
+    Browse Domains <i class="bi bi-arrow-right ms-1"></i>
+  </a>
+</div>
+
+{# ── Stats ────────────────────────────────────────────────────────────────── #}
 <div class="row g-3 mb-4">
   <div class="col-6 col-md-3">
     <div class="lms-stat-card">
@@ -29,17 +40,17 @@
   <div class="col-6 col-md-3">
     <div class="lms-stat-card">
       <div class="lms-stat-icon"><i class="bi bi-journals text-info"></i></div>
-      <div class="lms-stat-value">{{ total_assigned }}</div>
-      <div class="lms-stat-label">Enrolled</div>
+      <div class="lms-stat-value">{{ my_courses|length }}</div>
+      <div class="lms-stat-label">My Courses</div>
     </div>
   </div>
 </div>
 
-{# ── Continue Learning ───────────────────────────────────────────────────── #}
+{# ── Continue Learning ────────────────────────────────────────────────────── #}
 {% if in_progress %}
-<div class="mb-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0">Continue Learning</h5>
+<section class="mb-4">
+  <div class="lms-section-header mb-3">
+    <h5 class="fw-bold mb-0"><i class="bi bi-play-circle-fill text-primary me-2"></i>Continue Learning</h5>
   </div>
   <div class="row g-3">
     {% for p, module in in_progress %}
@@ -48,9 +59,10 @@
         <div class="lms-module-card h-100">
           <div class="lms-module-thumb lms-thumb-{{ module.difficulty }}">
             <i class="bi bi-play-circle-fill lms-thumb-icon"></i>
+            <div class="lms-thumb-progress" style="width:{{ p.watch_percentage|float }}%"></div>
           </div>
           <div class="lms-module-body">
-            <div class="d-flex gap-2 mb-1">
+            <div class="d-flex flex-wrap gap-1 mb-1">
               <span class="lms-pill lms-pill-domain">{{ module.domain.replace('_',' ').title() }}</span>
               <span class="lms-pill lms-pill-{{ module.difficulty }}">{{ module.difficulty.title() }}</span>
             </div>
@@ -59,7 +71,7 @@
             <div class="lms-progress-wrap">
               <div class="d-flex justify-content-between small text-secondary mb-1">
                 <span>Progress</span>
-                <span>{{ p.watch_percentage|float|round|int }}%</span>
+                <span class="fw-semibold text-primary">{{ p.watch_percentage|float|round|int }}%</span>
               </div>
               <div class="progress lms-progress-bar">
                 <div class="progress-bar bg-primary" style="width:{{ p.watch_percentage|float }}%"></div>
@@ -67,7 +79,7 @@
             </div>
             <div class="lms-module-footer">
               {% if module.duration_minutes %}<span><i class="bi bi-clock"></i> {{ module.duration_minutes }} min</span>{% endif %}
-              <span class="ms-auto text-primary fw-semibold small">Resume <i class="bi bi-arrow-right"></i></span>
+              <span class="ms-auto fw-semibold small" style="color:var(--wiq-accent)">Resume <i class="bi bi-arrow-right"></i></span>
             </div>
           </div>
         </div>
@@ -75,14 +87,67 @@
     </div>
     {% endfor %}
   </div>
-</div>
+</section>
 {% endif %}
 
-{# ── My Domains ──────────────────────────────────────────────────────────── #}
+{# ── My Courses ───────────────────────────────────────────────────────────── #}
+{% if my_courses %}
+<section class="mb-4">
+  <div class="lms-section-header mb-3">
+    <h5 class="fw-bold mb-0"><i class="bi bi-journals text-info me-2"></i>My Courses</h5>
+    <span class="badge bg-light text-secondary border small">{{ my_courses|length }} enrolled</span>
+  </div>
+  <div class="row g-3">
+    {% for p, module in my_courses %}
+    <div class="col-md-6 col-lg-4">
+      <a href="{{ url_for('learning.module_detail', module_id=module.id) }}" class="text-decoration-none">
+        <div class="lms-module-card h-100">
+          <div class="lms-module-thumb lms-thumb-{{ 'completed' if p.status == 'completed' else module.difficulty }}">
+            {% if p.status == 'completed' %}
+            <i class="bi bi-check-circle-fill lms-thumb-icon text-success opacity-90"></i>
+            {% elif p.status == 'in_progress' %}
+            <i class="bi bi-play-circle-fill lms-thumb-icon"></i>
+            {% else %}
+            <i class="bi bi-book-fill lms-thumb-icon"></i>
+            {% endif %}
+          </div>
+          <div class="lms-module-body">
+            <div class="d-flex flex-wrap gap-1 mb-2">
+              <span class="lms-pill lms-pill-{{ module.difficulty }}">{{ module.difficulty.title() }}</span>
+              {% if p.status == 'completed' %}
+              <span class="lms-pill" style="background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0"><i class="bi bi-check2"></i> Done</span>
+              {% elif p.status == 'in_progress' %}
+              <span class="lms-pill" style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe"><i class="bi bi-play-fill"></i> In Progress</span>
+              {% endif %}
+            </div>
+            <h6 class="lms-module-title">{{ module.title }}</h6>
+            {% if module.lms_domain %}
+            <p class="small text-secondary mb-2" style="margin-top:-.1rem">{{ module.lms_domain.name }}</p>
+            {% endif %}
+            <div class="mt-auto">
+              <div class="d-flex justify-content-between small text-secondary mb-1">
+                <span>{{ p.status.replace('_',' ').title() }}</span>
+                <span class="fw-semibold">{{ p.watch_percentage|float|round|int }}%</span>
+              </div>
+              <div class="progress lms-progress-bar">
+                <div class="progress-bar {{ 'bg-success' if p.status == 'completed' else 'bg-primary' }}"
+                     style="width:{{ p.watch_percentage|float }}%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{# ── Learning Domains ─────────────────────────────────────────────────────── #}
 {% if domain_stats %}
-<div class="mb-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="fw-bold mb-0">Learning Domains</h5>
+<section class="mb-4">
+  <div class="lms-section-header mb-3">
+    <h5 class="fw-bold mb-0"><i class="bi bi-collection-fill text-warning me-2"></i>Learning Domains</h5>
     <a href="{{ url_for('learning.domains') }}" class="btn btn-sm btn-outline-primary">Browse all</a>
   </div>
   <div class="row g-3">
@@ -90,18 +155,22 @@
     <div class="col-md-6 col-lg-4">
       <a href="{{ url_for('learning.domain_detail', domain_id=d.domain.id) }}" class="text-decoration-none">
         <div class="lms-domain-card">
-          <div class="lms-domain-thumb" {% if d.thumbnail_url %}style="background-image:url('{{ d.thumbnail_url }}')"{% endif %}>
+          <div class="lms-domain-thumb"
+               {% if d.thumbnail_url %}style="background-image:url('{{ d.thumbnail_url }}');background-size:cover;background-position:center"{% endif %}>
             {% if not d.thumbnail_url %}<i class="bi bi-collection-fill lms-domain-icon"></i>{% endif %}
           </div>
           <div class="lms-domain-body">
             <h6 class="lms-domain-title">{{ d.domain.name }}</h6>
-            <p class="lms-domain-desc small text-secondary">{{ d.domain.description[:60] ~ '…' if d.domain.description and d.domain.description|length > 60 else d.domain.description or '' }}</p>
+            <p class="lms-domain-desc small text-secondary">
+              {{ d.domain.description[:60] ~ '…' if d.domain.description and d.domain.description|length > 60 else d.domain.description or '' }}
+            </p>
             <div class="d-flex justify-content-between align-items-center mb-1 small text-secondary">
               <span>{{ d.done }}/{{ d.total }} modules</span>
-              <span>{{ d.pct }}%</span>
+              <span class="fw-semibold {{ 'text-success' if d.pct == 100 else '' }}">{{ d.pct }}%</span>
             </div>
             <div class="progress lms-progress-bar">
-              <div class="progress-bar {{ 'bg-success' if d.pct == 100 else 'bg-primary' }}" style="width:{{ d.pct }}%"></div>
+              <div class="progress-bar {{ 'bg-success' if d.pct == 100 else 'bg-primary' }}"
+                   style="width:{{ d.pct }}%"></div>
             </div>
           </div>
         </div>
@@ -109,7 +178,7 @@
     </div>
     {% endfor %}
   </div>
-</div>
+</section>
 {% else %}
 <div class="lms-empty-state mb-4">
   <i class="bi bi-collection lms-empty-icon"></i>
@@ -118,10 +187,49 @@
 </div>
 {% endif %}
 
-{# ── Recently Completed ──────────────────────────────────────────────────── #}
+{# ── Recommended for You ──────────────────────────────────────────────────── #}
+{% if recommended %}
+<section class="mb-4">
+  <div class="lms-section-header mb-3">
+    <h5 class="fw-bold mb-0"><i class="bi bi-lightbulb-fill text-success me-2"></i>Recommended for You</h5>
+  </div>
+  <div class="row g-3">
+    {% for module in recommended %}
+    <div class="col-md-6 col-lg-4">
+      <a href="{{ url_for('learning.module_detail', module_id=module.id) }}" class="text-decoration-none">
+        <div class="lms-module-card h-100">
+          <div class="lms-module-thumb lms-thumb-{{ module.difficulty }}">
+            {% if module.content_type == 'youtube' %}<i class="bi bi-play-circle-fill lms-thumb-icon"></i>
+            {% elif module.content_type == 'pdf' %}<i class="bi bi-file-earmark-pdf-fill lms-thumb-icon"></i>
+            {% elif module.content_type == 'ppt' %}<i class="bi bi-file-earmark-slides-fill lms-thumb-icon"></i>
+            {% else %}<i class="bi bi-book-fill lms-thumb-icon"></i>{% endif %}
+          </div>
+          <div class="lms-module-body">
+            <div class="d-flex flex-wrap gap-1 mb-1">
+              <span class="lms-pill lms-pill-{{ module.difficulty }}">{{ module.difficulty.title() }}</span>
+              <span class="lms-pill lms-pill-type">{{ module.content_type.upper() }}</span>
+            </div>
+            <h6 class="lms-module-title">{{ module.title }}</h6>
+            <p class="lms-module-desc">{{ module.description[:80] ~ '…' if module.description and module.description|length > 80 else module.description or '' }}</p>
+            <div class="lms-module-footer">
+              {% if module.duration_minutes %}<span class="small text-secondary"><i class="bi bi-clock"></i> {{ module.duration_minutes }} min</span>{% endif %}
+              <span class="ms-auto fw-semibold small text-success">Start <i class="bi bi-arrow-right"></i></span>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{# ── Recently Completed ───────────────────────────────────────────────────── #}
 {% if recently_completed %}
-<div class="mb-2">
-  <h5 class="fw-bold mb-3">Recently Completed</h5>
+<section class="mb-2">
+  <div class="lms-section-header mb-3">
+    <h5 class="fw-bold mb-0"><i class="bi bi-check-circle-fill text-success me-2"></i>Recently Completed</h5>
+  </div>
   <div class="row g-3">
     {% for p, module in recently_completed %}
     <div class="col-md-6 col-lg-3">
@@ -132,7 +240,7 @@
           </div>
           <div class="lms-module-body">
             <h6 class="lms-module-title">{{ module.title }}</h6>
-            <span class="badge bg-success-subtle text-success border border-success-subtle">Completed</span>
+            <span class="badge bg-success-subtle text-success border border-success-subtle small">Completed</span>
             {% if p.completed_at %}
             <div class="small text-secondary mt-1">{{ p.completed_at.strftime('%b %d, %Y') }}</div>
             {% endif %}
@@ -142,6 +250,16 @@
     </div>
     {% endfor %}
   </div>
+</section>
+{% endif %}
+
+{# Empty state #}
+{% if not in_progress and not my_courses and not domain_stats %}
+<div class="lms-empty-state mt-3">
+  <i class="bi bi-mortarboard lms-empty-icon"></i>
+  <h6>Your learning journey starts here</h6>
+  <p class="text-secondary small">Browse domains and open your first module to begin tracking progress.</p>
+  <a href="{{ url_for('learning.domains') }}" class="btn btn-primary btn-sm mt-2">Browse Domains</a>
 </div>
 {% endif %}
 

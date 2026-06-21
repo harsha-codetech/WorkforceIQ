@@ -6,7 +6,7 @@
 
 <div class="profile-layout">
 
-  {# ── LEFT COLUMN ──────────────────────────────────────────────────────── #}
+  {# ── LEFT COLUMN ──────────────────────────────────────────────────────────── #}
   <div class="profile-left">
 
     {# Profile card #}
@@ -36,32 +36,7 @@
       </div>
     </div>
 
-    {# Growth Score card #}
-    <div class="card mb-3">
-      <div class="card-body">
-        <h6 class="fw-bold text-secondary mb-3">Growth Score</h6>
-        <div class="text-center mb-3">
-          <div class="score-ring cat-{{ score.category }}">{{ score.overall }}</div>
-          <div class="mt-1">{{ score_badge(score.category) }}</div>
-        </div>
-        <canvas id="scoreRadar" height="200"></canvas>
-        <div class="mt-3">
-          {% for key, label in [('learning','Learning'),('assessment','Assessment'),('goal','Goals'),('skill','Skills'),('consistency','Consistency')] %}
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <span class="small text-secondary">{{ label }}</span>
-            <div class="d-flex align-items-center gap-2">
-              <div class="progress flex-grow-1" style="width:80px;height:6px">
-                <div class="progress-bar bg-primary" style="width:{{ score.components[key] }}%"></div>
-              </div>
-              <span class="small fw-semibold" style="min-width:32px;text-align:right">{{ score.components[key] }}</span>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-
-    {# Skills card #}
+    {# Skills #}
     {% if skills %}
     <div class="card mb-3">
       <div class="card-body">
@@ -79,25 +54,42 @@
     </div>
     {% endif %}
 
+    {# Quick actions #}
+    <div class="card">
+      <div class="card-body">
+        <h6 class="fw-bold mb-3">Quick Actions</h6>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{{ url_for('learning.catalog') }}" class="btn btn-sm btn-primary">
+            <i class="bi bi-mortarboard me-1"></i>My Learning
+          </a>
+          <a href="{{ url_for('learning.domains') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-collection me-1"></i>Domains
+          </a>
+          <a href="{{ url_for('goals.index') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-bullseye me-1"></i>Goals
+          </a>
+          <a href="{{ url_for('skills.matrix') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-diagram-3 me-1"></i>Skills
+          </a>
+          <a href="{{ url_for('leaderboard.index') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-trophy me-1"></i>Leaderboard
+          </a>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  {# ── RIGHT COLUMN ─────────────────────────────────────────────────────── #}
+  {# ── RIGHT COLUMN ─────────────────────────────────────────────────────────── #}
   <div class="profile-right">
 
-    {# Learning stats row #}
+    {# 1 · Learning statistics row #}
     <div class="row g-3 mb-3">
       <div class="col-6 col-md-3">
         <div class="lms-stat-card">
           <div class="lms-stat-icon"><i class="bi bi-check-circle-fill text-success"></i></div>
           <div class="lms-stat-value">{{ completed }}</div>
-          <div class="lms-stat-label">Modules Done</div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="lms-stat-card">
-          <div class="lms-stat-icon"><i class="bi bi-collection-fill text-primary"></i></div>
-          <div class="lms-stat-value">{{ assignments }}</div>
-          <div class="lms-stat-label">Enrolled</div>
+          <div class="lms-stat-label">Completed</div>
         </div>
       </div>
       <div class="col-6 col-md-3">
@@ -109,6 +101,13 @@
       </div>
       <div class="col-6 col-md-3">
         <div class="lms-stat-card">
+          <div class="lms-stat-icon"><i class="bi bi-collection-fill text-primary"></i></div>
+          <div class="lms-stat-value">{{ assignments }}</div>
+          <div class="lms-stat-label">Enrolled</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="lms-stat-card">
           <div class="lms-stat-icon"><i class="bi bi-graph-up text-info"></i></div>
           <div class="lms-stat-value">{{ score.components.assessment }}%</div>
           <div class="lms-stat-label">Assess. Avg</div>
@@ -116,7 +115,54 @@
       </div>
     </div>
 
-    {# Goals #}
+    {# 2 · Continue Learning #}
+    {% if continue_learning %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="fw-bold mb-0">
+            <i class="bi bi-play-circle-fill text-primary me-2"></i>Continue Learning
+          </h6>
+          <a href="{{ url_for('learning.catalog') }}" class="small text-primary">View all</a>
+        </div>
+        {% for p, module in continue_learning %}
+        <div class="d-flex align-items-center gap-3 py-2 {{ 'border-top' if not loop.first }}">
+          <div class="lms-mini-thumb lms-thumb-{{ module.difficulty }}">
+            <i class="bi bi-play-fill" style="color:rgba(255,255,255,.85);font-size:.9rem"></i>
+          </div>
+          <div class="flex-grow-1" style="min-width:0">
+            <a href="{{ url_for('learning.module_detail', module_id=module.id) }}"
+               class="text-dark fw-semibold small d-block text-truncate">{{ module.title }}</a>
+            <div class="d-flex align-items-center gap-2 mt-1">
+              <div class="progress flex-grow-1"
+                   style="height:4px;border-radius:4px;background:#e9ecef;overflow:hidden">
+                <div class="progress-bar bg-primary" style="width:{{ p.watch_percentage|float }}%"></div>
+              </div>
+              <span class="small text-secondary text-nowrap">{{ p.watch_percentage|float|round|int }}%</span>
+            </div>
+          </div>
+          <a href="{{ url_for('learning.module_detail', module_id=module.id) }}"
+             class="btn btn-xs btn-primary flex-shrink-0">Resume</a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% else %}
+    <div class="card mb-3">
+      <div class="card-body d-flex align-items-center gap-3">
+        <div class="lms-mini-thumb lms-thumb-beginner">
+          <i class="bi bi-mortarboard" style="color:rgba(255,255,255,.8)"></i>
+        </div>
+        <div class="flex-grow-1">
+          <div class="fw-semibold small">Start learning today</div>
+          <div class="small text-secondary">Browse domains and open your first module.</div>
+        </div>
+        <a href="{{ url_for('learning.catalog') }}" class="btn btn-xs btn-primary flex-shrink-0">Explore</a>
+      </div>
+    </div>
+    {% endif %}
+
+    {# 3 · Goals #}
     <div class="card mb-3">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -152,7 +198,7 @@
       </div>
     </div>
 
-    {# Recent assessment activity #}
+    {# 4 · Recent Assessments #}
     {% if recent_assessments %}
     <div class="card mb-3">
       <div class="card-body">
@@ -161,7 +207,8 @@
           <a href="{{ url_for('assessments.index') }}" class="small text-primary">View all</a>
         </div>
         {% for attempt in recent_assessments %}
-        <div class="d-flex justify-content-between align-items-center py-2 {{ 'border-top' if not loop.first }}">
+        <div class="d-flex justify-content-between align-items-center py-2
+                    {{ 'border-top' if not loop.first }}">
           <div>
             <div class="small fw-semibold">{{ attempt.assessment.title }}</div>
             <div class="text-secondary" style="font-size:.75rem">
@@ -173,7 +220,9 @@
             <div class="fw-bold {{ 'text-success' if attempt.result == 'pass' else 'text-danger' }}">
               {{ attempt.percentage|float|round(1) }}%
             </div>
-            <span class="badge {{ 'bg-success-subtle text-success border border-success-subtle' if attempt.result == 'pass' else 'bg-danger-subtle text-danger border border-danger-subtle' }} small">
+            <span class="badge {{ 'bg-success-subtle text-success border border-success-subtle'
+                                  if attempt.result == 'pass'
+                                  else 'bg-danger-subtle text-danger border border-danger-subtle' }} small">
               {{ attempt.result.title() if attempt.result else 'Pending' }}
             </span>
           </div>
@@ -183,12 +232,13 @@
     </div>
     {% endif %}
 
-    {# Badges #}
+    {# 5 · Badges #}
     <div class="card mb-3">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h6 class="fw-bold mb-0">Achievements</h6>
-          <a href="{{ url_for('badges.employee_badges', employee_id=employee.id) }}" class="small text-primary">View all</a>
+          <a href="{{ url_for('badges.employee_badges', employee_id=employee.id) }}"
+             class="small text-primary">View all</a>
         </div>
         {% if badges %}
         <div class="d-flex flex-wrap gap-2">
@@ -205,22 +255,40 @@
       </div>
     </div>
 
-    {# Quick links #}
+    {# 6 · Growth Score — intentionally last, after all learning content #}
     <div class="card">
       <div class="card-body">
-        <h6 class="fw-bold mb-3">Quick Actions</h6>
-        <div class="d-flex flex-wrap gap-2">
-          <a href="{{ url_for('learning.catalog') }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-mortarboard me-1"></i>My Learning</a>
-          <a href="{{ url_for('learning.domains') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-collection me-1"></i>Browse Domains</a>
-          <a href="{{ url_for('goals.index') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-bullseye me-1"></i>Goals</a>
-          <a href="{{ url_for('skills.matrix') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-diagram-3 me-1"></i>Skills</a>
-          <a href="{{ url_for('leaderboard.index') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-trophy me-1"></i>Leaderboard</a>
+        <h6 class="fw-bold text-secondary mb-3">Growth Score</h6>
+        <div class="row align-items-center g-2">
+          <div class="col-auto text-center">
+            <div class="score-ring cat-{{ score.category }}">{{ score.overall }}</div>
+            <div class="mt-1">{{ score_badge(score.category) }}</div>
+          </div>
+          <div class="col">
+            <canvas id="scoreRadar" height="170"></canvas>
+          </div>
+        </div>
+        <div class="mt-3">
+          {% for key, label in [('learning','Learning'),('assessment','Assessment'),
+                                ('goal','Goals'),('skill','Skills'),('consistency','Consistency')] %}
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="small text-secondary">{{ label }}</span>
+            <div class="d-flex align-items-center gap-2">
+              <div class="progress" style="width:80px;height:5px;border-radius:3px">
+                <div class="progress-bar bg-primary" style="width:{{ score.components[key] }}%"></div>
+              </div>
+              <span class="small fw-semibold" style="min-width:28px;text-align:right">
+                {{ score.components[key] }}
+              </span>
+            </div>
+          </div>
+          {% endfor %}
         </div>
       </div>
     </div>
 
-  </div>
-</div>
+  </div>{# end profile-right #}
+</div>{# end profile-layout #}
 
 {% endblock %}
 {% block scripts %}

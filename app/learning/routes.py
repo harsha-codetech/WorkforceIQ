@@ -59,6 +59,29 @@ def catalog():
         for a in ModuleAssignment.query.filter_by(employee_id=emp_id).all()
     }
 
+    # My Courses: every module the user has opened (any progress record)
+    my_courses = (
+        db.session.query(LearningProgress, LearningModule)
+        .join(LearningModule, LearningProgress.module_id == LearningModule.id)
+        .filter(
+            LearningProgress.employee_id == emp_id,
+            LearningModule.is_active == True,
+        )
+        .order_by(LearningProgress.last_activity_at.desc())
+        .limit(12)
+        .all()
+    )
+
+    # Recommended: active domain modules not yet started
+    started_ids = set(progress_map.keys())
+    recommended_q = LearningModule.query.filter(
+        LearningModule.is_active == True,
+        LearningModule.domain_id.isnot(None),
+    )
+    if started_ids:
+        recommended_q = recommended_q.filter(LearningModule.id.notin_(started_ids))
+    recommended = recommended_q.order_by(LearningModule.created_at.desc()).limit(6).all()
+
     in_progress_rows = (
         db.session.query(LearningProgress, LearningModule)
         .join(LearningModule, LearningProgress.module_id == LearningModule.id)
@@ -106,6 +129,8 @@ def catalog():
         total_assigned=total_assigned,
         domain_stats=domain_stats,
         progress_map=progress_map,
+        my_courses=my_courses,
+        recommended=recommended,
     )
 
 

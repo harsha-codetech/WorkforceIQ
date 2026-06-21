@@ -563,3 +563,97 @@ a { text-decoration: none; }
   font-size: .78rem;
   color: #92400e;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Learning Home — hero banner
+   ═══════════════════════════════════════════════════════════════════════════ */
+.lms-home-hero {
+  background: linear-gradient(135deg, #1f3a5f 0%, #2d72d9 100%);
+  border-radius: .85rem;
+  padding: 1.75rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+@media (max-width: 576px) {
+  .lms-home-hero { flex-direction: column; align-items: flex-start; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Section headers (Home page)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.lms-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Module card — thumbnail progress stripe
+   ═══════════════════════════════════════════════════════════════════════════ */
+.lms-module-thumb { position: relative; overflow: hidden; }
+.lms-thumb-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background: var(--wiq-accent);
+  border-radius: 0 2px 0 0;
+  max-width: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Udemy-style curriculum step numbers
+   ═══════════════════════════════════════════════════════════════════════════ */
+.lms-curriculum-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: .72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background .15s, color .15s;
+}
+.lms-resource-item.active .lms-curriculum-num {
+  background: var(--wiq-accent);
+  color: #fff;
+}
+.lms-curriculum-num.done {
+  background: transparent;
+  color: #22c55e;
+  font-size: .95rem;
+}
+
+/* Udemy-style active left border on resource items */
+.lms-resource-item.active {
+  background: #eff6ff;
+  border-left: 3px solid var(--wiq-accent);
+}
+.lms-resource-item:not(.active) {
+  border-left: 3px solid transparent;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Mini module thumbnail — used in dashboard inline lists
+   ═══════════════════════════════════════════════════════════════════════════ */
+.lms-mini-thumb {
+  width: 42px;
+  height: 42px;
+  border-radius: .5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.lms-mini-thumb.lms-thumb-beginner     { background: linear-gradient(135deg, #6ee7b7, #34d399); }
+.lms-mini-thumb.lms-thumb-intermediate { background: linear-gradient(135deg, #fde68a, #f59e0b); }
+.lms-mini-thumb.lms-thumb-advanced     { background: linear-gradient(135deg, #93c5fd, #3b82f6); }
+.lms-mini-thumb.lms-thumb-expert       { background: linear-gradient(135deg, #c4b5fd, #7c3aed); }
+.lms-mini-thumb.lms-thumb-completed    { background: linear-gradient(135deg, #6ee7b7, #10b981); }

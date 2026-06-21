@@ -13,6 +13,7 @@ from app.models import (
     EmployeeBadge,
     EmployeeSkill,
     Goal,
+    LearningModule,
     LearningProgress,
     ModuleAssignment,
     PerformanceScore,
@@ -89,6 +90,18 @@ def _employee_dashboard(employee_id):
         .limit(5)
         .all()
     )
+    continue_learning = (
+        db.session.query(LearningProgress, LearningModule)
+        .join(LearningModule, LearningProgress.module_id == LearningModule.id)
+        .filter(
+            LearningProgress.employee_id == employee_id,
+            LearningProgress.status == "in_progress",
+            LearningModule.is_active == True,
+        )
+        .order_by(LearningProgress.last_activity_at.desc())
+        .limit(3)
+        .all()
+    )
     return render_template(
         "dashboard/employee.html",
         employee=employee,
@@ -102,6 +115,7 @@ def _employee_dashboard(employee_id):
         badges=badges,
         skills=skills,
         recent_assessments=recent_assessments,
+        continue_learning=continue_learning,
     )
 
 
@@ -114,8 +128,34 @@ def _manager_dashboard():
     avg = round(
         sum(s["overall"] for _, s in scores) / len(scores), 1
     ) if scores else 0
+
+    # Manager's personal learning data
+    mgr_id = current_user.id
+    mgr_completed = LearningProgress.query.filter_by(
+        employee_id=mgr_id, status="completed"
+    ).count()
+    mgr_hours = round(
+        (db.session.query(func.coalesce(func.sum(LearningProgress.watch_seconds), 0))
+         .filter_by(employee_id=mgr_id).scalar() or 0) / 3600, 1
+    )
+    mgr_in_progress = (
+        db.session.query(LearningProgress, LearningModule)
+        .join(LearningModule, LearningProgress.module_id == LearningModule.id)
+        .filter(
+            LearningProgress.employee_id == mgr_id,
+            LearningProgress.status == "in_progress",
+            LearningModule.is_active == True,
+        )
+        .order_by(LearningProgress.last_activity_at.desc())
+        .limit(3)
+        .all()
+    )
     return render_template(
-        "dashboard/manager.html", team=team, scores=scores, team_avg=avg
+        "dashboard/manager.html",
+        team=team, scores=scores, team_avg=avg,
+        mgr_completed=mgr_completed,
+        mgr_hours=mgr_hours,
+        mgr_in_progress=mgr_in_progress,
     )
 
 

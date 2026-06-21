@@ -1,9 +1,9 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block title %}{{ domain.name }}{% endblock %}
 {% block heading %}{{ domain.name }}{% endblock %}
 {% block content %}
 
-{# ── Banner ────────────────────────────────────────────────────────────────── #}
+{# â”€â”€ Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ #}
 <div class="lms-domain-hero mb-4" {% if banner_url %}style="background-image:linear-gradient(rgba(15,23,42,.55),rgba(15,23,42,.7)),url('{{ banner_url }}');background-size:cover;background-position:center"{% endif %}>
   <div class="lms-domain-hero-body">
     <h2 class="fw-bold text-white mb-2">{{ domain.name }}</h2>
@@ -11,8 +11,8 @@
     <div class="d-flex flex-wrap gap-3">
       <span class="lms-hero-stat"><i class="bi bi-journals"></i> {{ modules|length }} module{{ 's' if modules|length != 1 }}</span>
       <span class="lms-hero-stat"><i class="bi bi-clock"></i> {{ total_hours }}h total</span>
-      {% if current_user.is_employee %}
-      <span class="lms-hero-stat"><i class="bi bi-check-circle"></i> {{ total_completed }} completed · {{ pct }}%</span>
+      {% if not current_user.is_admin %}
+      <span class="lms-hero-stat"><i class="bi bi-check-circle"></i> {{ total_completed }} completed Â· {{ pct }}%</span>
       {% endif %}
     </div>
   </div>
@@ -23,7 +23,7 @@
   {% endif %}
 </div>
 
-{# ── Module grid ───────────────────────────────────────────────────────────── #}
+{# â”€â”€ Module grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ #}
 {% if current_user.is_admin %}
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h5 class="fw-bold mb-0">Modules in this domain</h5>
@@ -54,7 +54,7 @@
             <span class="lms-pill lms-pill-type">{{ m.content_type.upper() }}</span>
           </div>
           <h6 class="lms-module-title">{{ m.title }}</h6>
-          <p class="lms-module-desc">{{ m.description[:80] ~ '…' if m.description and m.description|length > 80 else m.description or '' }}</p>
+          <p class="lms-module-desc">{{ m.description[:80] ~ 'â€¦' if m.description and m.description|length > 80 else m.description or '' }}</p>
 
           {% if not current_user.is_admin %}
           <div class="lms-progress-wrap">

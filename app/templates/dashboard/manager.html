@@ -3,38 +3,163 @@
 {% block title %}Team Dashboard{% endblock %}
 {% block heading %}Team Performance{% endblock %}
 {% block content %}
-<div class="row g-3 mb-3">
-  <div class="col-md-4"><div class="card stat-card"><div class="card-body">
-    <div class="stat-label">Team Members</div><div class="stat-value">{{ team|length }}</div>
-  </div></div></div>
-  <div class="col-md-4"><div class="card stat-card"><div class="card-body">
-    <div class="stat-label">Avg Growth Score</div><div class="stat-value">{{ team_avg }}</div>
-  </div></div></div>
-  <div class="col-md-4"><div class="card stat-card"><div class="card-body">
-    <div class="stat-label">Workforce Intel</div>
-    <a href="{{ url_for('intelligence.dashboard') }}" class="btn btn-sm btn-primary mt-2">Open analytics</a>
-  </div></div></div>
+
+{# ══════════════════════════════════════════════════════════════════════════════
+   My Learning — manager's personal learning section
+   ══════════════════════════════════════════════════════════════════════════════ #}
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h6 class="fw-bold mb-0">
+        <i class="bi bi-mortarboard text-primary me-2"></i>My Learning
+      </h6>
+      <a href="{{ url_for('learning.catalog') }}" class="btn btn-sm btn-primary">Open My Learning</a>
+    </div>
+
+    {# Mini stats #}
+    <div class="row g-2 mb-3">
+      <div class="col-6 col-md-3">
+        <div class="text-center p-2 rounded" style="background:#f0fdf4">
+          <div class="fw-bold fs-5 text-success">{{ mgr_completed }}</div>
+          <div class="small text-secondary">Completed</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="text-center p-2 rounded" style="background:#fffbeb">
+          <div class="fw-bold fs-5 text-warning">{{ mgr_hours }}h</div>
+          <div class="small text-secondary">Hours</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="text-center p-2 rounded" style="background:#eff6ff">
+          <div class="fw-bold fs-5 text-primary">{{ mgr_in_progress|length }}</div>
+          <div class="small text-secondary">In Progress</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <a href="{{ url_for('learning.domains') }}"
+           class="btn btn-outline-secondary w-100 h-100 d-flex align-items-center justify-content-center gap-2 small fw-semibold"
+           style="min-height:54px">
+          <i class="bi bi-collection"></i>Browse Domains
+        </a>
+      </div>
+    </div>
+
+    {# Continue learning inline list #}
+    {% if mgr_in_progress %}
+    <div class="border-top pt-3">
+      <div class="small fw-semibold text-secondary mb-2">Continue where you left off</div>
+      {% for p, module in mgr_in_progress %}
+      <div class="d-flex align-items-center gap-3 py-2 {{ 'border-top' if not loop.first }}">
+        <div class="lms-mini-thumb lms-thumb-{{ module.difficulty }}">
+          <i class="bi bi-play-fill" style="color:rgba(255,255,255,.85);font-size:.9rem"></i>
+        </div>
+        <div class="flex-grow-1" style="min-width:0">
+          <a href="{{ url_for('learning.module_detail', module_id=module.id) }}"
+             class="text-dark fw-semibold small d-block text-truncate">{{ module.title }}</a>
+          <div class="d-flex align-items-center gap-2 mt-1">
+            <div class="progress flex-grow-1"
+                 style="height:4px;border-radius:4px;background:#e9ecef;overflow:hidden">
+              <div class="progress-bar bg-primary"
+                   style="width:{{ p.watch_percentage|float }}%"></div>
+            </div>
+            <span class="small text-secondary text-nowrap">
+              {{ p.watch_percentage|float|round|int }}%
+            </span>
+          </div>
+        </div>
+        <a href="{{ url_for('learning.module_detail', module_id=module.id) }}"
+           class="btn btn-xs btn-primary flex-shrink-0">Resume</a>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="border-top pt-3 d-flex align-items-center gap-3">
+      <i class="bi bi-lightbulb text-warning fs-4"></i>
+      <div>
+        <div class="small fw-semibold">No courses in progress yet</div>
+        <div class="small text-secondary">
+          Browse domains to start learning alongside your team.
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
 </div>
 
-<div class="card"><div class="card-body">
-  <h6 class="text-secondary mb-3">Direct Reports</h6>
-  <div class="table-responsive">
-    <table class="table align-middle">
-      <thead><tr><th>Employee</th><th>Learning</th><th>Assessment</th><th>Goals</th><th>Overall</th><th>Category</th><th></th></tr></thead>
-      <tbody>
-        {% for member, s in scores %}
-        <tr>
-          <td class="fw-semibold">{{ member.full_name }}<div class="small text-secondary">{{ member.email }}</div></td>
-          <td>{{ s.components.learning }}</td>
-          <td>{{ s.components.assessment }}</td>
-          <td>{{ s.components.goal }}</td>
-          <td class="fw-bold cat-{{ s.category }}">{{ s.overall }}</td>
-          <td>{{ score_badge(s.category) }}</td>
-          <td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('main.employee_profile', employee_id=member.id) }}">View</a></td>
-        </tr>
-        {% else %}<tr><td colspan="7" class="text-secondary">No team members assigned.</td></tr>{% endfor %}
-      </tbody>
-    </table>
+{# ══════════════════════════════════════════════════════════════════════════════
+   Team overview
+   ══════════════════════════════════════════════════════════════════════════════ #}
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="card stat-card">
+      <div class="card-body">
+        <div class="stat-label">Team Members</div>
+        <div class="stat-value">{{ team|length }}</div>
+      </div>
+    </div>
   </div>
-</div></div>
+  <div class="col-md-4">
+    <div class="card stat-card">
+      <div class="card-body">
+        <div class="stat-label">Avg Growth Score</div>
+        <div class="stat-value">{{ team_avg }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card">
+      <div class="card-body">
+        <div class="stat-label">Workforce Intel</div>
+        <a href="{{ url_for('intelligence.dashboard') }}"
+           class="btn btn-sm btn-primary mt-2">Open analytics</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h6 class="text-secondary mb-3">Direct Reports</h6>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Learning</th>
+            <th>Assessment</th>
+            <th>Goals</th>
+            <th>Overall</th>
+            <th>Category</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for member, s in scores %}
+          <tr>
+            <td class="fw-semibold">
+              {{ member.full_name }}
+              <div class="small text-secondary">{{ member.email }}</div>
+            </td>
+            <td>{{ s.components.learning }}</td>
+            <td>{{ s.components.assessment }}</td>
+            <td>{{ s.components.goal }}</td>
+            <td class="fw-bold cat-{{ s.category }}">{{ s.overall }}</td>
+            <td>{{ score_badge(s.category) }}</td>
+            <td>
+              <a class="btn btn-sm btn-outline-primary"
+                 href="{{ url_for('main.employee_profile', employee_id=member.id) }}">View</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7" class="text-secondary">No team members assigned.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 {% endblock %}

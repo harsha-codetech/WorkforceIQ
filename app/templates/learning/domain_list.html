@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block title %}Learning Domains{% endblock %}
 {% block heading %}Learning Domains{% endblock %}
 {% block content %}
@@ -26,12 +26,12 @@
       </div>
       <div class="lms-domain-card-body">
         <h5 class="fw-bold mb-1">{{ d.domain.name }}</h5>
-        <p class="text-secondary small mb-3">{{ d.domain.description[:100] ~ '…' if d.domain.description and d.domain.description|length > 100 else d.domain.description or 'No description.' }}</p>
+        <p class="text-secondary small mb-3">{{ d.domain.description[:100] ~ 'â€¦' if d.domain.description and d.domain.description|length > 100 else d.domain.description or 'No description.' }}</p>
         <div class="d-flex gap-3 mb-3 small">
           <span><i class="bi bi-journals text-primary me-1"></i>{{ d.total }} module{{ 's' if d.total != 1 }}</span>
           <span><i class="bi bi-clock text-secondary me-1"></i>{{ d.total_hours }}h</span>
         </div>
-        {% if current_user.is_employee %}
+        {% if not current_user.is_admin %}
         <div class="d-flex justify-content-between small text-secondary mb-1">
           <span>{{ d.done }}/{{ d.total }} completed</span>
           <span>{{ d.pct }}%</span>
